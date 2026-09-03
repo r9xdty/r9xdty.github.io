@@ -17,7 +17,6 @@
   <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180.png">
-  <link rel="preload" as="image" href="robot-arm-hero.webp" type="image/webp">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
@@ -170,7 +169,17 @@
     .button.primary { color: var(--ink); background: var(--signal); border-color: var(--signal); }
     .button.primary:hover { background: var(--signal-soft); border-color: var(--signal-soft); }
 
-    .hero-art { position: relative; min-height: min(76vh, 760px); z-index: 1; isolation: isolate; }
+    .hero-art {
+      --field-x: 0px; --field-y: 0px;
+      position: relative; min-height: min(76vh, 760px); z-index: 1; isolation: isolate;
+      perspective: 900px;
+    }
+    .hero-art::before {
+      content: ""; position: absolute; z-index: 0; inset: 8% -3% 7% -10%;
+      border: 1px solid rgba(242,241,235,.09);
+      background: linear-gradient(135deg, rgba(255,255,255,.018), transparent 42%);
+      clip-path: polygon(0 0, 92% 0, 100% 10%, 100% 100%, 8% 100%, 0 90%);
+    }
     .hero-art::after {
       content: ""; position: absolute; z-index: -1; inset: 9% -8% 2% -18%;
       background: radial-gradient(circle at 54% 48%, rgba(158,231,245,.12), rgba(255,107,44,.055) 38%, transparent 68%);
@@ -184,13 +193,48 @@
       position: absolute; top: 16.5%; right: 22%; width: 9px; height: 9px; border-radius: 50%;
       background: var(--signal); box-shadow: 0 0 28px var(--signal);
     }
-    .hero-robot {
-      position: absolute; z-index: 2; width: 145%; max-width: none; height: auto;
-      left: -28%; top: 50%; transform: translate3d(var(--robot-x, 0), calc(-50% + var(--robot-y, 0px)), 0) rotate(var(--robot-r, 0deg));
-      transform-origin: 46% 68%; filter: drop-shadow(0 34px 42px rgba(0,0,0,.44));
-      -webkit-mask-image: radial-gradient(ellipse 72% 68% at 53% 51%, #000 50%, transparent 88%);
-      mask-image: radial-gradient(ellipse 72% 68% at 53% 51%, #000 50%, transparent 88%);
-      transition: transform .55s var(--ease); will-change: transform;
+    .hero-field {
+      position: absolute; z-index: 1; inset: 2% -8% 0 -13%; width: 121%; height: 98%;
+      transform: translate3d(var(--field-x), var(--field-y), 0) rotateX(2deg) rotateY(-3deg);
+      transform-origin: 52% 52%; transition: transform .45s var(--ease); will-change: transform;
+    }
+    .field-stage {
+      position: absolute; z-index: 3; display: grid; grid-template-columns: 22px auto; align-items: center; gap: 8px;
+      color: rgba(242,241,235,.58); font-size: 9px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase;
+      transform: translate3d(var(--field-x), var(--field-y), 0); transition: transform .5s var(--ease), color .25s;
+    }
+    .field-stage span { width: 22px; height: 22px; display: grid; place-items: center; border: 1px solid rgba(158,231,245,.34); border-radius: 50%; color: var(--ice); font-size: 8px; }
+    .field-stage.one { left: 4%; bottom: 22%; }
+    .field-stage.two { left: 36%; top: 25%; }
+    .field-stage.three { right: 9%; top: 39%; }
+    .field-stage.four { right: 17%; bottom: 15%; }
+    .field-readout {
+      position: absolute; z-index: 3; left: 2%; top: 12%; padding-left: 14px; border-left: 1px solid var(--signal);
+      transform: translate3d(var(--field-x), var(--field-y), 0); transition: transform .5s var(--ease);
+    }
+    .field-readout span, .field-readout strong { display: block; text-transform: uppercase; }
+    .field-readout span { color: var(--muted); font-size: 9px; letter-spacing: .16em; }
+    .field-readout strong { margin-top: 5px; color: var(--paper); font-family: var(--display); font-size: 15px; font-weight: 550; letter-spacing: .06em; }
+    .field-corner { position: absolute; z-index: 3; width: 30px; height: 30px; border-color: rgba(242,241,235,.28); pointer-events: none; }
+    .field-corner.a { left: -10%; top: 8%; border-left: 1px solid; border-top: 1px solid; }
+    .field-corner.b { right: -3%; bottom: 7%; border-right: 1px solid; border-bottom: 1px solid; }
+
+    .sound-toggle {
+      position: fixed; z-index: 96; right: 22px; bottom: 22px; min-width: 126px; min-height: 48px;
+      display: inline-flex; align-items: center; justify-content: center; gap: 11px; padding: 0 16px;
+      border: 1px solid rgba(242,241,235,.2); border-radius: 999px; color: #c8ccd0;
+      background: rgba(10,11,13,.78); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+      transition: color .25s, border-color .25s, background .25s, transform .25s var(--ease);
+    }
+    .sound-toggle:hover { transform: translateY(-2px); color: var(--white); border-color: rgba(242,241,235,.42); }
+    .sound-toggle[aria-pressed="true"] { color: var(--ink); border-color: var(--signal); background: var(--signal); }
+    .sound-bars { height: 15px; display: flex; align-items: center; gap: 2px; }
+    .sound-bars i { width: 2px; height: 5px; display: block; background: currentColor; transform-origin: center; }
+    .sound-toggle[aria-pressed="true"] .sound-bars i { animation: sound-wave .8s ease-in-out infinite alternate; }
+    .sound-toggle[aria-pressed="true"] .sound-bars i:nth-child(2) { animation-delay: -.35s; }
+    .sound-toggle[aria-pressed="true"] .sound-bars i:nth-child(3) { animation-delay: -.6s; }
+    @keyframes sound-wave { to { transform: scaleY(2.6); } }
     }
     .arm-shadow { filter: blur(18px); opacity: .28; }
     .arm-bone { fill: none; stroke: url(#armGradient); stroke-width: 34; stroke-linecap: round; stroke-linejoin: round; }
@@ -411,7 +455,9 @@
       .hero-copy { padding-bottom: 10px; }
       h1 { margin-top: 22px; font-size: clamp(62px, 19vw, 104px); }
       .hero-art { min-height: 520px; margin: -10px -12vw 0; }
-      .hero-robot { width: 128%; left: -14%; }
+      .hero-field { inset-inline: -18%; width: 136%; }
+      .field-stage.one { left: 7%; }
+      .field-stage.three { right: 7%; }
       .scroll-cue { display: none; }
       .manifesto-grid, .method-head, .experience-grid { grid-template-columns: 1fr; }
       .manifesto-foot { grid-column: 1; }
@@ -452,8 +498,15 @@
       .hero-actions { align-items: stretch; }
       .button { flex: 1 1 100%; }
       .hero-art { min-height: 430px; margin-top: 12px; }
-      .hero-robot { width: 150%; left: -25%; }
+      .hero-field { inset: 0 -34% 0 -26%; width: 160%; }
+      .field-stage { font-size: 8px; }
+      .field-stage.two { left: 31%; }
+      .field-stage.three { right: 4%; }
+      .field-stage.four { right: 11%; }
+      .field-readout { left: 13%; }
       .hero-art-note { right: 12%; }
+      .sound-toggle { right: 14px; bottom: 14px; min-width: 48px; width: 48px; padding: 0; }
+      .sound-toggle > span:last-child { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
       .manifesto-foot { grid-template-columns: 1fr; }
       .feature-media { min-height: 0; }
       .feature-copy { min-height: 0; gap: 36px; }
@@ -476,6 +529,9 @@
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
   <div class="progress" aria-hidden="true"></div>
+  <button class="sound-toggle" id="soundToggle" type="button" aria-pressed="false" aria-label="Play ambient soundscape">
+    <span class="sound-bars" aria-hidden="true"><i></i><i></i><i></i></span><span id="soundLabel">Ambient off</span>
+  </button>
 
   <header class="site-header">
     <div class="nav shell">
@@ -507,8 +563,12 @@
 
         <div class="hero-art" id="heroArt" aria-hidden="true">
           <div class="orbit one"></div><div class="orbit two"></div><div class="orbit three"></div><i class="orbit-dot"></i>
-          <img class="hero-robot" src="robot-arm-hero.webp" width="1536" height="1024" alt="" fetchpriority="high" decoding="async">
-          <div class="hero-art-note"><i></i>Six axes · one system</div>
+          <canvas class="hero-field" id="heroField"></canvas>
+          <div class="field-readout"><span>Live motion stack</span><strong id="fieldState">CAD / Loaded</strong></div>
+          <div class="field-stage one"><span>01</span>CAD</div><div class="field-stage two"><span>02</span>Plan</div>
+          <div class="field-stage three"><span>03</span>Control</div><div class="field-stage four"><span>04</span>Verify</div>
+          <i class="field-corner a"></i><i class="field-corner b"></i>
+          <div class="hero-art-note"><i></i>Move pointer · trace path</div>
         </div>
       </div>
       <div class="scroll-cue"><span><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="m5 7 5 5 5-5" stroke="currentColor" stroke-width="1.5"/></svg></span>Scroll to begin</div>
@@ -619,7 +679,6 @@
           <a href="mailto:mustafa.altuntas.201m5@gmail.com">mustafa.altuntas.201m5@gmail.com <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 16 16 4M7 4h9v9" stroke="currentColor" stroke-width="1.6"/></svg></a>
           <a href="https://github.com/r9xdty" target="_blank" rel="noreferrer">GitHub <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 16 16 4M7 4h9v9" stroke="currentColor" stroke-width="1.6"/></svg></a>
           <a href="https://www.linkedin.com/in/mustafa-altuntas1" target="_blank" rel="noreferrer">LinkedIn <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 16 16 4M7 4h9v9" stroke="currentColor" stroke-width="1.6"/></svg></a>
-          <a href="tel:+905395475194">+90 539 547 5194</a>
         </div>
         <footer class="footer"><span>© <span id="year">2026</span> Mustafa Altuntaş</span><span>Istanbul · UTC+3 · Open to remote work</span></footer>
       </div>
@@ -635,6 +694,158 @@
     const header = document.querySelector('.site-header');
     const navLinks = [...document.querySelectorAll('.nav-links a[href^="#"]')];
     let ticking = false;
+
+    const soundButton = document.getElementById('soundToggle');
+    const soundLabel = document.getElementById('soundLabel');
+    let audioContext, masterGain, chimeTimer, soundActive = false;
+
+    function buildSoundscape() {
+      const AudioEngine = window.AudioContext || window.webkitAudioContext;
+      if (!AudioEngine) return false;
+      audioContext = new AudioEngine();
+      masterGain = audioContext.createGain();
+      masterGain.gain.value = .0001;
+      masterGain.connect(audioContext.destination);
+
+      const filter = audioContext.createBiquadFilter();
+      filter.type = 'lowpass'; filter.frequency.value = 420; filter.Q.value = .7;
+      filter.connect(masterGain);
+      [[55, 'sine', .038], [82.41, 'triangle', .018], [110, 'sine', .009]].forEach(([frequency, type, level], index) => {
+        const oscillator = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        oscillator.type = type; oscillator.frequency.value = frequency;
+        oscillator.detune.value = index === 1 ? -7 : index === 2 ? 5 : 0;
+        gain.gain.value = level; oscillator.connect(gain).connect(filter); oscillator.start();
+      });
+
+      const lfo = audioContext.createOscillator();
+      const lfoDepth = audioContext.createGain();
+      lfo.frequency.value = .055; lfoDepth.gain.value = 110;
+      lfo.connect(lfoDepth).connect(filter.frequency); lfo.start();
+
+      const noiseBuffer = audioContext.createBuffer(1, audioContext.sampleRate * 2, audioContext.sampleRate);
+      const noise = noiseBuffer.getChannelData(0);
+      for (let i = 0; i < noise.length; i++) noise[i] = (Math.random() * 2 - 1) * .35;
+      const air = audioContext.createBufferSource();
+      const airFilter = audioContext.createBiquadFilter();
+      const airGain = audioContext.createGain();
+      air.buffer = noiseBuffer; air.loop = true; airFilter.type = 'bandpass'; airFilter.frequency.value = 760; airFilter.Q.value = .45; airGain.gain.value = .012;
+      air.connect(airFilter).connect(airGain).connect(masterGain); air.start();
+      return true;
+    }
+
+    function scheduleChime() {
+      clearTimeout(chimeTimer);
+      if (!soundActive || !audioContext) return;
+      chimeTimer = setTimeout(() => {
+        if (!soundActive) return;
+        const now = audioContext.currentTime;
+        const ping = audioContext.createOscillator();
+        const pingGain = audioContext.createGain();
+        ping.type = 'sine'; ping.frequency.setValueAtTime(Math.random() > .5 ? 440 : 329.63, now);
+        ping.frequency.exponentialRampToValueAtTime(220, now + 2.6);
+        pingGain.gain.setValueAtTime(.0001, now); pingGain.gain.exponentialRampToValueAtTime(.018, now + .08); pingGain.gain.exponentialRampToValueAtTime(.0001, now + 2.6);
+        ping.connect(pingGain).connect(masterGain); ping.start(now); ping.stop(now + 2.7);
+        scheduleChime();
+      }, 6200 + Math.random() * 4200);
+    }
+
+    function setSound(active) {
+      soundActive = active;
+      soundButton.setAttribute('aria-pressed', String(active));
+      soundButton.setAttribute('aria-label', active ? 'Pause ambient soundscape' : 'Play ambient soundscape');
+      soundLabel.textContent = active ? 'Ambient on' : 'Ambient off';
+      if (!audioContext && active && !buildSoundscape()) { soundLabel.textContent = 'Unavailable'; return; }
+      if (!audioContext) return;
+      audioContext.resume();
+      const now = audioContext.currentTime;
+      masterGain.gain.cancelScheduledValues(now);
+      masterGain.gain.setValueAtTime(Math.max(masterGain.gain.value, .0001), now);
+      masterGain.gain.exponentialRampToValueAtTime(active ? .72 : .0001, now + .7);
+      if (active) scheduleChime(); else clearTimeout(chimeTimer);
+    }
+    soundButton.addEventListener('click', () => setSound(!soundActive));
+    document.addEventListener('visibilitychange', () => {
+      if (!audioContext) return;
+      if (document.hidden) audioContext.suspend(); else if (soundActive) audioContext.resume();
+    });
+
+    const heroArt = document.getElementById('heroArt');
+    const heroCanvas = document.getElementById('heroField');
+    const fieldStateLabel = document.getElementById('fieldState');
+    const fieldContext = heroCanvas.getContext('2d');
+    const fieldPointer = { x: .5, y: .5, tx: .5, ty: .5 };
+    let fieldWidth = 0, fieldHeight = 0, fieldFrame, fieldRunning = !reducedMotion;
+    const cloud = Array.from({ length: 150 }, (_, index) => ({
+      angle: index * 2.39996,
+      radius: .12 + ((index * 47) % 100) / 250,
+      depth: ((index * 71) % 100) / 100,
+      speed: .035 + (index % 7) * .006
+    }));
+
+    function resizeField() {
+      const rect = heroCanvas.getBoundingClientRect();
+      const ratio = Math.min(devicePixelRatio || 1, 2);
+      fieldWidth = Math.max(1, rect.width); fieldHeight = Math.max(1, rect.height);
+      heroCanvas.width = Math.round(fieldWidth * ratio); heroCanvas.height = Math.round(fieldHeight * ratio);
+      fieldContext.setTransform(ratio, 0, 0, ratio, 0, 0);
+    }
+
+    function curvePoint(t) {
+      const p0 = {x:.08,y:.72}, p1 = {x:.31,y:.78}, p2 = {x:.55,y:.18}, p3 = {x:.9,y:.47};
+      const u = 1 - t;
+      return { x: u*u*u*p0.x + 3*u*u*t*p1.x + 3*u*t*t*p2.x + t*t*t*p3.x, y: u*u*u*p0.y + 3*u*u*t*p1.y + 3*u*t*t*p2.y + t*t*t*p3.y };
+    }
+
+    function drawField(now = 0) {
+      fieldPointer.x += (fieldPointer.tx - fieldPointer.x) * .035;
+      fieldPointer.y += (fieldPointer.ty - fieldPointer.y) * .035;
+      const ctx = fieldContext, w = fieldWidth, h = fieldHeight, time = now * .001;
+      ctx.clearRect(0, 0, w, h);
+      const ox = (fieldPointer.x - .5) * 24, oy = (fieldPointer.y - .5) * 18;
+
+      const haze = ctx.createRadialGradient(w*.55+ox,h*.48+oy,0,w*.55,h*.48,w*.48);
+      haze.addColorStop(0,'rgba(158,231,245,.09)'); haze.addColorStop(.5,'rgba(255,107,44,.035)'); haze.addColorStop(1,'rgba(10,11,13,0)');
+      ctx.fillStyle = haze; ctx.fillRect(0,0,w,h);
+
+      ctx.lineWidth = 1;
+      for (let ring = 1; ring <= 4; ring++) {
+        ctx.beginPath(); ctx.ellipse(w*.56+ox*(ring*.12),h*.5+oy*(ring*.12),w*(.1+ring*.085),h*(.075+ring*.06),-.18,0,Math.PI*2);
+        ctx.strokeStyle = ring === 3 ? 'rgba(255,107,44,.16)' : 'rgba(158,231,245,.10)'; ctx.stroke();
+      }
+
+      cloud.forEach(point => {
+        const angle = point.angle + time * point.speed;
+        const x = w*.56 + Math.cos(angle) * w * point.radius + ox * (.2 + point.depth);
+        const y = h*.5 + Math.sin(angle) * h * point.radius * .56 + Math.sin(angle*2.1+time*.1)*12 + oy * (.2 + point.depth);
+        const alpha = .12 + point.depth * .42;
+        ctx.fillStyle = `rgba(158,231,245,${alpha})`; ctx.fillRect(x,y,point.depth > .72 ? 2 : 1,point.depth > .72 ? 2 : 1);
+      });
+
+      const path = new Path2D();
+      for (let i = 0; i <= 80; i++) {
+        const p = curvePoint(i/80), x = p.x*w+ox, y = p.y*h+oy;
+        if (i === 0) path.moveTo(x,y); else path.lineTo(x,y);
+      }
+      ctx.save(); ctx.shadowColor = 'rgba(255,107,44,.7)'; ctx.shadowBlur = 12; ctx.strokeStyle = 'rgba(255,107,44,.88)'; ctx.lineWidth = 2; ctx.stroke(path); ctx.restore();
+
+      const travel = reducedMotion ? .72 : (time % 10) / 10;
+      const marker = curvePoint(travel), mx = marker.x*w+ox, my = marker.y*h+oy;
+      ctx.beginPath(); ctx.arc(mx,my,8,0,Math.PI*2); ctx.fillStyle = '#0a0b0d'; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = '#f2f1eb'; ctx.stroke();
+      ctx.beginPath(); ctx.arc(mx,my,3,0,Math.PI*2); ctx.fillStyle = '#ff6b2c'; ctx.fill();
+
+      const stages = ['CAD / Loaded','Path / Solved','Control / Linked','Verify / Ready'];
+      fieldStateLabel.textContent = stages[Math.min(3, Math.floor(travel * 4))];
+      if (!reducedMotion && fieldRunning) fieldFrame = requestAnimationFrame(drawField);
+    }
+    resizeField(); drawField();
+    addEventListener('resize', () => { cancelAnimationFrame(fieldFrame); resizeField(); drawField(); }, { passive: true });
+    if (!reducedMotion) {
+      new IntersectionObserver(([entry]) => {
+        if (entry.isIntersecting && !fieldRunning) { fieldRunning = true; drawField(performance.now()); }
+        if (!entry.isIntersecting) { fieldRunning = false; cancelAnimationFrame(fieldFrame); }
+      }, { threshold: .01 }).observe(heroArt);
+    }
 
     function positionArm(ids, targetX, targetY, baseX, baseY, upper, lower) {
       const targetAngle = Math.atan2(targetY - baseY, targetX - baseX);
@@ -657,18 +868,18 @@
       tool?.setAttribute('d', `M${wristX.toFixed(1)} ${wristY.toFixed(1)} L${targetX.toFixed(1)} ${targetY.toFixed(1)}`);
     }
 
-    const heroArt = document.getElementById('heroArt');
     if (!reducedMotion && matchMedia('(pointer:fine)').matches) {
       heroArt.addEventListener('pointermove', event => {
         const rect = heroArt.getBoundingClientRect();
         const x = (event.clientX - rect.left) / rect.width - .5;
         const y = (event.clientY - rect.top) / rect.height - .5;
-        heroArt.style.setProperty('--robot-x', `${x * 18}px`);
-        heroArt.style.setProperty('--robot-y', `${y * 14}px`);
-        heroArt.style.setProperty('--robot-r', `${x * 1.2}deg`);
+        fieldPointer.tx = x + .5; fieldPointer.ty = y + .5;
+        heroArt.style.setProperty('--field-x', `${x * 10}px`);
+        heroArt.style.setProperty('--field-y', `${y * 8}px`);
       });
       heroArt.addEventListener('pointerleave', () => {
-        heroArt.style.setProperty('--robot-x', '0px'); heroArt.style.setProperty('--robot-y', '0px'); heroArt.style.setProperty('--robot-r', '0deg');
+        fieldPointer.tx = .5; fieldPointer.ty = .5;
+        heroArt.style.setProperty('--field-x', '0px'); heroArt.style.setProperty('--field-y', '0px');
       });
     }
 
