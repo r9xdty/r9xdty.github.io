@@ -529,9 +529,12 @@
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
   <div class="progress" aria-hidden="true"></div>
-  <button class="sound-toggle" id="soundToggle" type="button" aria-pressed="false" aria-label="Play ambient soundscape">
-    <span class="sound-bars" aria-hidden="true"><i></i><i></i><i></i></span><span id="soundLabel">Ambient off</span>
+  <button class="sound-toggle" id="soundToggle" type="button" aria-pressed="false" aria-label="Play lo-fi background music" title="“sansho” — James Gargette · CC0">
+    <span class="sound-bars" aria-hidden="true"><i></i><i></i><i></i></span><span id="soundLabel">Lo-fi off</span>
   </button>
+  <audio id="ambientTrack" loop preload="none">
+    <source src="assets/audio/sansho.mp3" type="audio/mpeg">
+  </audio>
 
   <header class="site-header">
     <div class="nav shell">
@@ -696,77 +699,56 @@
 
     const soundButton = document.getElementById('soundToggle');
     const soundLabel = document.getElementById('soundLabel');
-    let audioContext, masterGain, chimeTimer, soundActive = false;
+    const ambientTrack = document.getElementById('ambientTrack');
+    const ambientVolume = .24;
+    let soundActive = false;
+    let fadeFrame;
+    let resumeWhenVisible = false;
 
-    function buildSoundscape() {
-      const AudioEngine = window.AudioContext || window.webkitAudioContext;
-      if (!AudioEngine) return false;
-      audioContext = new AudioEngine();
-      masterGain = audioContext.createGain();
-      masterGain.gain.value = .0001;
-      masterGain.connect(audioContext.destination);
-
-      const filter = audioContext.createBiquadFilter();
-      filter.type = 'lowpass'; filter.frequency.value = 420; filter.Q.value = .7;
-      filter.connect(masterGain);
-      [[55, 'sine', .038], [82.41, 'triangle', .018], [110, 'sine', .009]].forEach(([frequency, type, level], index) => {
-        const oscillator = audioContext.createOscillator();
-        const gain = audioContext.createGain();
-        oscillator.type = type; oscillator.frequency.value = frequency;
-        oscillator.detune.value = index === 1 ? -7 : index === 2 ? 5 : 0;
-        gain.gain.value = level; oscillator.connect(gain).connect(filter); oscillator.start();
-      });
-
-      const lfo = audioContext.createOscillator();
-      const lfoDepth = audioContext.createGain();
-      lfo.frequency.value = .055; lfoDepth.gain.value = 110;
-      lfo.connect(lfoDepth).connect(filter.frequency); lfo.start();
-
-      const noiseBuffer = audioContext.createBuffer(1, audioContext.sampleRate * 2, audioContext.sampleRate);
-      const noise = noiseBuffer.getChannelData(0);
-      for (let i = 0; i < noise.length; i++) noise[i] = (Math.random() * 2 - 1) * .35;
-      const air = audioContext.createBufferSource();
-      const airFilter = audioContext.createBiquadFilter();
-      const airGain = audioContext.createGain();
-      air.buffer = noiseBuffer; air.loop = true; airFilter.type = 'bandpass'; airFilter.frequency.value = 760; airFilter.Q.value = .45; airGain.gain.value = .012;
-      air.connect(airFilter).connect(airGain).connect(masterGain); air.start();
-      return true;
-    }
-
-    function scheduleChime() {
-      clearTimeout(chimeTimer);
-      if (!soundActive || !audioContext) return;
-      chimeTimer = setTimeout(() => {
-        if (!soundActive) return;
-        const now = audioContext.currentTime;
-        const ping = audioContext.createOscillator();
-        const pingGain = audioContext.createGain();
-        ping.type = 'sine'; ping.frequency.setValueAtTime(Math.random() > .5 ? 440 : 329.63, now);
-        ping.frequency.exponentialRampToValueAtTime(220, now + 2.6);
-        pingGain.gain.setValueAtTime(.0001, now); pingGain.gain.exponentialRampToValueAtTime(.018, now + .08); pingGain.gain.exponentialRampToValueAtTime(.0001, now + 2.6);
-        ping.connect(pingGain).connect(masterGain); ping.start(now); ping.stop(now + 2.7);
-        scheduleChime();
-      }, 6200 + Math.random() * 4200);
-    }
-
-    function setSound(active) {
+    function renderSoundState(active) {
       soundActive = active;
       soundButton.setAttribute('aria-pressed', String(active));
-      soundButton.setAttribute('aria-label', active ? 'Pause ambient soundscape' : 'Play ambient soundscape');
-      soundLabel.textContent = active ? 'Ambient on' : 'Ambient off';
-      if (!audioContext && active && !buildSoundscape()) { soundLabel.textContent = 'Unavailable'; return; }
-      if (!audioContext) return;
-      audioContext.resume();
-      const now = audioContext.currentTime;
-      masterGain.gain.cancelScheduledValues(now);
-      masterGain.gain.setValueAtTime(Math.max(masterGain.gain.value, .0001), now);
-      masterGain.gain.exponentialRampToValueAtTime(active ? .72 : .0001, now + .7);
-      if (active) scheduleChime(); else clearTimeout(chimeTimer);
+      soundButton.setAttribute('aria-label', active ? 'Pause lo-fi background music' : 'Play lo-fi background music');
+      soundLabel.textContent = active ? 'Lo-fi on' : 'Lo-fi off';
+    }
+
+    function fadeTrack(targetVolume, duration = 650, onComplete) {
+      cancelAnimationFrame(fadeFrame);
+      const startVolume = ambientTrack.volume;
+      const startedAt = performance.now();
+      const step = now => {
+        const amount = clamp((now - startedAt) / duration, 0, 1);
+        ambientTrack.volume = lerp(startVolume, targetVolume, amount);
+        if (amount < 1) fadeFrame = requestAnimationFrame(step);
+        else if (onComplete) onComplete();
+      };
+      fadeFrame = requestAnimationFrame(step);
+    }
+
+    async function setSound(active) {
+      renderSoundState(active);
+      if (!active) {
+        fadeTrack(0, 450, () => ambientTrack.pause());
+        return;
+      }
+      ambientTrack.volume = 0;
+      try {
+        await ambientTrack.play();
+        if (soundActive) fadeTrack(ambientVolume);
+      } catch (error) {
+        renderSoundState(false);
+        soundLabel.textContent = 'Audio unavailable';
+      }
     }
     soundButton.addEventListener('click', () => setSound(!soundActive));
     document.addEventListener('visibilitychange', () => {
-      if (!audioContext) return;
-      if (document.hidden) audioContext.suspend(); else if (soundActive) audioContext.resume();
+      if (document.hidden && soundActive && !ambientTrack.paused) {
+        resumeWhenVisible = true;
+        ambientTrack.pause();
+      } else if (!document.hidden && soundActive && resumeWhenVisible) {
+        resumeWhenVisible = false;
+        ambientTrack.play().catch(() => renderSoundState(false));
+      }
     });
 
     const heroArt = document.getElementById('heroArt');
