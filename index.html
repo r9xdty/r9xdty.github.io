@@ -17,6 +17,7 @@
   <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180.png">
+  <link rel="preload" as="image" href="robot-arm-hero.webp" type="image/webp">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
@@ -143,7 +144,7 @@
       background-size: clamp(52px, 7vw, 100px) clamp(52px, 7vw, 100px);
       mask-image: linear-gradient(to bottom, transparent 5%, #000 45%, transparent 100%);
     }
-    .hero-inner { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(400px, .95fr); align-items: center; gap: 4vw; }
+    .hero-inner { display: grid; grid-template-columns: minmax(0, .92fr) minmax(500px, 1.08fr); align-items: center; gap: 0; }
     .hero-copy { position: relative; z-index: 4; padding-bottom: 7vh; }
     .availability { display: inline-flex; align-items: center; gap: 9px; margin-left: 14px; color: #c5cac5; }
     .availability i { width: 6px; height: 6px; border-radius: 50%; background: #9fe870; box-shadow: 0 0 15px #9fe870; }
@@ -169,7 +170,12 @@
     .button.primary { color: var(--ink); background: var(--signal); border-color: var(--signal); }
     .button.primary:hover { background: var(--signal-soft); border-color: var(--signal-soft); }
 
-    .hero-art { position: relative; min-height: min(70vh, 700px); z-index: 1; }
+    .hero-art { position: relative; min-height: min(76vh, 760px); z-index: 1; isolation: isolate; }
+    .hero-art::after {
+      content: ""; position: absolute; z-index: -1; inset: 9% -8% 2% -18%;
+      background: radial-gradient(circle at 54% 48%, rgba(158,231,245,.12), rgba(255,107,44,.055) 38%, transparent 68%);
+      filter: blur(18px); pointer-events: none;
+    }
     .orbit { position: absolute; border: 1px solid rgba(242,241,235,.12); border-radius: 50%; }
     .orbit.one { inset: 4% -10% 0 2%; }
     .orbit.two { inset: 17% 2% 13% 16%; border-style: dashed; border-color: rgba(158,231,245,.2); }
@@ -178,7 +184,14 @@
       position: absolute; top: 16.5%; right: 22%; width: 9px; height: 9px; border-radius: 50%;
       background: var(--signal); box-shadow: 0 0 28px var(--signal);
     }
-    .arm-svg { position: absolute; inset: 5% -4% -2% -6%; width: 110%; height: 100%; overflow: visible; }
+    .hero-robot {
+      position: absolute; z-index: 2; width: 145%; max-width: none; height: auto;
+      left: -28%; top: 50%; transform: translate3d(var(--robot-x, 0), calc(-50% + var(--robot-y, 0px)), 0) rotate(var(--robot-r, 0deg));
+      transform-origin: 46% 68%; filter: drop-shadow(0 34px 42px rgba(0,0,0,.44));
+      -webkit-mask-image: radial-gradient(ellipse 72% 68% at 53% 51%, #000 50%, transparent 88%);
+      mask-image: radial-gradient(ellipse 72% 68% at 53% 51%, #000 50%, transparent 88%);
+      transition: transform .55s var(--ease); will-change: transform;
+    }
     .arm-shadow { filter: blur(18px); opacity: .28; }
     .arm-bone { fill: none; stroke: url(#armGradient); stroke-width: 34; stroke-linecap: round; stroke-linejoin: round; }
     .arm-edge { fill: none; stroke: rgba(255,255,255,.18); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
@@ -190,7 +203,7 @@
     .target-path { fill: none; stroke: rgba(158,231,245,.6); stroke-width: 1.5; stroke-dasharray: 5 9; }
     .target-ring { fill: none; stroke: var(--ice); stroke-width: 1.5; }
     .hero-art-note {
-      position: absolute; right: 4%; bottom: 6%; display: flex; align-items: center; gap: 10px;
+      position: absolute; z-index: 3; right: 4%; bottom: 6%; display: flex; align-items: center; gap: 10px;
       color: var(--muted); font-size: 10px; letter-spacing: .16em; text-transform: uppercase;
     }
     .hero-art-note i { width: 34px; height: 1px; background: var(--signal); }
@@ -266,9 +279,9 @@
     }
     .section-head p { max-width: 430px; margin: 0 0 8px; color: var(--muted-dark); font-size: 17px; }
 
-    .feature { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(360px, .75fr); min-height: 720px; background: var(--ink); color: var(--paper); }
-    .feature-media { position: relative; min-height: 570px; overflow: hidden; background: #08090a; }
-    .feature-media video { width: 100%; height: 100%; object-fit: cover; filter: saturate(.65) contrast(1.08); }
+    .feature { display: block; overflow: hidden; background: var(--ink); color: var(--paper); }
+    .feature-media { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #08090a; }
+    .feature-media video { width: 100%; height: 100%; object-fit: contain; background: #08090a; filter: saturate(.78) contrast(1.04); }
     .feature-media::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(180deg, transparent 50%, rgba(10,11,13,.6)); }
     .video-control {
       position: absolute; z-index: 2; left: 28px; bottom: 28px; min-width: 126px; min-height: 48px;
@@ -278,15 +291,19 @@
     }
     .video-control:hover { background: var(--paper); color: var(--ink); transform: translateY(-2px); }
     .video-control svg { width: 14px; }
-    .feature-copy { display: flex; flex-direction: column; justify-content: space-between; padding: clamp(34px, 5vw, 74px); }
+    .feature-copy {
+      display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(440px, .95fr);
+      align-items: end; gap: clamp(48px, 8vw, 128px); padding: clamp(44px, 6vw, 82px);
+      border-top: 1px solid var(--line);
+    }
     .feature-top { display: flex; align-items: center; justify-content: space-between; color: var(--muted); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; }
     .feature-copy h3 {
-      margin: 38px 0 24px; font-family: var(--display); font-size: clamp(42px, 5vw, 74px);
+      max-width: 11ch; margin: 38px 0 24px; font-family: var(--display); font-size: clamp(52px, 6vw, 92px);
       font-variation-settings: "wdth" 92, "wght" 640; font-weight: 640; line-height: .92; letter-spacing: -.05em;
     }
-    .feature-copy > div > p { margin: 0; color: #abb1b8; font-size: 17px; }
+    .feature-copy > div > p { max-width: 58ch; margin: 0; color: #abb1b8; font-size: 17px; }
     .feature-copy strong { color: var(--paper); font-weight: 500; }
-    .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; margin-top: 45px; background: var(--line); border: 1px solid var(--line); }
+    .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; margin: 0; background: var(--line); border: 1px solid var(--line); }
     .metric { padding: 18px; background: var(--ink); }
     .metric b { display: block; font-family: var(--display); font-size: 25px; font-weight: 560; }
     .metric span { color: var(--muted); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; }
@@ -375,10 +392,9 @@
     .js .reveal.in { opacity: 1; transform: none; }
 
     @media (max-width: 1100px) {
-      .hero-inner { grid-template-columns: 1fr .8fr; }
-      .hero-art { min-height: 560px; }
-      .feature { grid-template-columns: 1fr; }
-      .feature-copy { min-height: 570px; }
+      .hero-inner { grid-template-columns: minmax(0, .9fr) minmax(440px, 1.1fr); }
+      .hero-art { min-height: 600px; }
+      .feature-copy { grid-template-columns: 1fr; gap: 48px; }
       .project-grid { grid-template-columns: 1fr 1fr; }
       .project-card:last-child { grid-column: 1 / -1; min-height: 520px; }
       .project-card:last-child .project-visual { max-width: 520px; width: 100%; margin-inline: auto; }
@@ -395,6 +411,7 @@
       .hero-copy { padding-bottom: 10px; }
       h1 { margin-top: 22px; font-size: clamp(62px, 19vw, 104px); }
       .hero-art { min-height: 520px; margin: -10px -12vw 0; }
+      .hero-robot { width: 128%; left: -14%; }
       .scroll-cue { display: none; }
       .manifesto-grid, .method-head, .experience-grid { grid-template-columns: 1fr; }
       .manifesto-foot { grid-column: 1; }
@@ -413,7 +430,7 @@
 
       .section-head { display: block; }
       .section-head p { margin-top: 28px; }
-      .feature-media { min-height: 450px; }
+      .feature-media { min-height: 0; }
       .card-hint { display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
       .card-hint::after { content: "→"; color: var(--signal-dark); font-size: 16px; }
       .project-grid { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; margin-inline: calc(var(--pad) * -1); padding: 0 var(--pad) 14px; scrollbar-width: none; }
@@ -435,11 +452,12 @@
       .hero-actions { align-items: stretch; }
       .button { flex: 1 1 100%; }
       .hero-art { min-height: 430px; margin-top: 12px; }
+      .hero-robot { width: 150%; left: -25%; }
       .hero-art-note { right: 12%; }
       .manifesto-foot { grid-template-columns: 1fr; }
-      .feature-media { min-height: 350px; }
-      .feature-copy { min-height: 600px; }
-      .metric-grid { margin-top: 35px; }
+      .feature-media { min-height: 0; }
+      .feature-copy { min-height: 0; gap: 36px; }
+      .metric-grid { margin-top: 0; }
       .project-card { flex-basis: 88vw; padding: 28px; }
       .role { grid-template-columns: 1fr; gap: 10px; }
       .contact { min-height: 100svh; }
@@ -489,14 +507,8 @@
 
         <div class="hero-art" id="heroArt" aria-hidden="true">
           <div class="orbit one"></div><div class="orbit two"></div><div class="orbit three"></div><i class="orbit-dot"></i>
-          <svg class="arm-svg" viewBox="0 0 800 620" role="presentation">
-            <defs><linearGradient id="armGradient" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#575d64"/><stop offset=".55" stop-color="#e9e8e2"/><stop offset="1" stop-color="#7a8087"/></linearGradient></defs>
-            <path class="target-path" id="heroTrace" d="M350 250 C520 90 720 170 690 340 C660 500 480 510 410 400"/>
-            <circle class="target-ring" cx="690" cy="340" r="13"/><path class="tool-cross" d="M674 340h32M690 324v32"/>
-            <path class="arm-bone arm-shadow" id="heroArmShadow" d="M180 500 L360 380 L520 260"/><path class="arm-bone" id="heroArm" d="M180 500 L360 380 L520 260"/><path class="arm-edge" id="heroArmEdge" d="M180 500 L360 380 L520 260"/>
-            <rect class="arm-base" x="116" y="496" width="128" height="40" rx="12"/><circle class="arm-joint core" cx="180" cy="500" r="20"/><circle class="arm-joint" id="heroElbow" cx="360" cy="380" r="17"/><circle class="arm-joint" id="heroWrist" cx="520" cy="260" r="14"/><path class="tool" id="heroTool" d="M520 260 l28 -18"/>
-          </svg>
-          <div class="hero-art-note"><i></i>Move your pointer</div>
+          <img class="hero-robot" src="robot-arm-hero.webp" width="1536" height="1024" alt="" fetchpriority="high" decoding="async">
+          <div class="hero-art-note"><i></i>Six axes · one system</div>
         </div>
       </div>
       <div class="scroll-cue"><span><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="m5 7 5 5 5-5" stroke="currentColor" stroke-width="1.5"/></svg></span>Scroll to begin</div>
@@ -524,6 +536,7 @@
           </div>
           <div class="journey-visual" aria-hidden="true">
             <svg class="journey-svg" viewBox="0 0 800 620">
+              <defs><linearGradient id="armGradient" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#575d64"/><stop offset=".55" stop-color="#e9e8e2"/><stop offset="1" stop-color="#7a8087"/></linearGradient></defs>
               <path class="seam" d="M80 460 C170 400 250 478 335 414 S500 315 720 344"/><path class="seam-live" id="seamLive" d="M80 460 C170 400 250 478 335 414 S500 315 720 344" pathLength="1"/>
               <path class="arm-bone arm-shadow" id="storyArmShadow" d="M180 510 L370 390 L520 290"/><path class="arm-bone" id="storyArm" d="M180 510 L370 390 L520 290"/><path class="arm-edge" id="storyArmEdge" d="M180 510 L370 390 L520 290"/>
               <rect class="arm-base" x="112" y="504" width="136" height="44" rx="12"/><circle class="arm-joint core" cx="180" cy="510" r="21"/><circle class="arm-joint" id="storyElbow" cx="370" cy="390" r="17"/><circle class="arm-joint" id="storyWrist" cx="520" cy="290" r="14"/><path class="tool" id="storyTool" d="M520 290l26 19"/>
@@ -624,7 +637,11 @@
     let ticking = false;
 
     function positionArm(ids, targetX, targetY, baseX, baseY, upper, lower) {
-      const dx = targetX - baseX, dy = targetY - baseY;
+      const targetAngle = Math.atan2(targetY - baseY, targetX - baseX);
+      const toolLength = 34;
+      const desiredWristX = targetX - Math.cos(targetAngle) * toolLength;
+      const desiredWristY = targetY - Math.sin(targetAngle) * toolLength;
+      const dx = desiredWristX - baseX, dy = desiredWristY - baseY;
       const distance = clamp(Math.hypot(dx, dy), Math.abs(upper - lower) + 2, upper + lower - 2);
       const angleToTarget = Math.atan2(dy, dx);
       const shoulderOffset = Math.acos(clamp((upper * upper + distance * distance - lower * lower) / (2 * upper * distance), -1, 1));
@@ -637,22 +654,22 @@
       ids.paths.forEach(id => document.getElementById(id)?.setAttribute('d', d));
       const elbow = document.getElementById(ids.elbow), wrist = document.getElementById(ids.wrist), tool = document.getElementById(ids.tool);
       elbow?.setAttribute('cx', elbowX); elbow?.setAttribute('cy', elbowY); wrist?.setAttribute('cx', wristX); wrist?.setAttribute('cy', wristY);
-      const toolAngle = angleToTarget + .3, toolX = wristX + Math.cos(toolAngle) * 34, toolY = wristY + Math.sin(toolAngle) * 34;
-      tool?.setAttribute('d', `M${wristX.toFixed(1)} ${wristY.toFixed(1)} L${toolX.toFixed(1)} ${toolY.toFixed(1)}`);
+      tool?.setAttribute('d', `M${wristX.toFixed(1)} ${wristY.toFixed(1)} L${targetX.toFixed(1)} ${targetY.toFixed(1)}`);
     }
 
     const heroArt = document.getElementById('heroArt');
-    let heroTarget = { x: 570, y: 255 };
-    function updateHeroArm() { positionArm({ paths: ['heroArmShadow','heroArm','heroArmEdge'], elbow: 'heroElbow', wrist: 'heroWrist', tool: 'heroTool' }, heroTarget.x, heroTarget.y, 180, 500, 225, 185); }
-    updateHeroArm();
     if (!reducedMotion && matchMedia('(pointer:fine)').matches) {
       heroArt.addEventListener('pointermove', event => {
         const rect = heroArt.getBoundingClientRect();
-        heroTarget.x = clamp(((event.clientX - rect.left) / rect.width) * 800, 300, 730);
-        heroTarget.y = clamp(((event.clientY - rect.top) / rect.height) * 620, 105, 455);
-        updateHeroArm();
+        const x = (event.clientX - rect.left) / rect.width - .5;
+        const y = (event.clientY - rect.top) / rect.height - .5;
+        heroArt.style.setProperty('--robot-x', `${x * 18}px`);
+        heroArt.style.setProperty('--robot-y', `${y * 14}px`);
+        heroArt.style.setProperty('--robot-r', `${x * 1.2}deg`);
       });
-      heroArt.addEventListener('pointerleave', () => { heroTarget = { x: 570, y: 255 }; updateHeroArm(); });
+      heroArt.addEventListener('pointerleave', () => {
+        heroArt.style.setProperty('--robot-x', '0px'); heroArt.style.setProperty('--robot-y', '0px'); heroArt.style.setProperty('--robot-r', '0deg');
+      });
     }
 
     const journey = document.getElementById('journey');
@@ -660,7 +677,7 @@
     const journeyBars = [...document.querySelectorAll('.journey-step i')];
     const stateLabel = document.getElementById('stateLabel');
     const stateLabels = ['Geometry loaded', 'Path solved', 'Motion active', 'Evidence captured'];
-    const storyTargets = [{x:310,y:400}, {x:455,y:326}, {x:610,y:352}, {x:705,y:343}];
+    const storyTargets = [{x:300,y:425}, {x:455,y:370}, {x:602,y:348}, {x:720,y:344}];
 
     function updateScroll() {
       const scrollMax = document.documentElement.scrollHeight - innerHeight;
@@ -678,10 +695,10 @@
         const phase = Math.min(2, Math.floor(p * 3));
         const local = p === 1 ? 1 : (p * 3) - phase;
         const from = storyTargets[phase], to = storyTargets[phase + 1];
-        positionArm({ paths: ['storyArmShadow','storyArm','storyArmEdge'], elbow:'storyElbow', wrist:'storyWrist', tool:'storyTool' }, lerp(from.x,to.x,local), lerp(from.y,to.y,local), 180, 510, 235, 195);
+        positionArm({ paths: ['storyArmShadow','storyArm','storyArmEdge'], elbow:'storyElbow', wrist:'storyWrist', tool:'storyTool' }, lerp(from.x,to.x,local), lerp(from.y,to.y,local), 180, 510, 300, 265);
         document.getElementById('seamLive').style.strokeDasharray = `${p} 1`;
       } else {
-        positionArm({ paths: ['storyArmShadow','storyArm','storyArmEdge'], elbow:'storyElbow', wrist:'storyWrist', tool:'storyTool' }, 610, 352, 180, 510, 235, 195);
+        positionArm({ paths: ['storyArmShadow','storyArm','storyArmEdge'], elbow:'storyElbow', wrist:'storyWrist', tool:'storyTool' }, 602, 348, 180, 510, 300, 265);
         document.getElementById('seamLive').style.strokeDasharray = '1 0';
       }
       ticking = false;
