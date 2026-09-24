@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İkili PDF Görüntüleyici</title>
+    <!-- Tailwind CSS for rapid styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Ana gövde ayarları - taşmayı ve scroll'u önlemek için */
+        body, html {
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        /* Ortadaki ayırıcı çubuğun stilleri */
+        .resizer {
+            width: 8px;
+            background-color: #cbd5e1; /* slate-300 */
+            cursor: col-resize;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .resizer:hover, .resizer.active {
+            background-color: #3b82f6; /* blue-500 */
+        }
+
+        /* Ayırıcı çubuktaki tutma çizgileri (görsel) */
+        .resizer::after {
+            content: "";
+            display: block;
+            width: 2px;
+            height: 30px;
+            background-color: white;
+            border-radius: 2px;
+        }
+
+        /* iframe içindeki PDF varsayılan olarak tarayıcının kendi araç çubuğuyla gelir 
+           Bu, kullanıcıya her iframe için bağımsız zoom ve scroll özelliği sağlar. */
+        iframe {
+            border: none;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Sürükleme sırasında iframe'lerin fare olaylarını çalmasını engellemek için */
+        .pointer-events-none-during-resize iframe {
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="flex flex-col bg-gray-100">
+
+    <!-- Üst Menü / Başlık -->
+    <header class="bg-indigo-600 text-white p-4 shadow-md flex justify-between items-center z-10 shrink-0">
+        <div class="flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="M8 13h2"/><path d="M8 17h2"/><path d="M14 13h2"/><path d="M14 17h2"/></svg>
+            <h1 class="text-xl font-bold">Eş Zamanlı İkili PDF Görüntüleyici</h1>
+        </div>
+        <div class="text-sm text-indigo-200">
+            Dosyalarınız tarayıcıda işlenir, sunucuya yüklenmez.
+        </div>
+    </header>
+
+    <!-- Ana İçerik Alanı (Yan Yana Paneller) -->
+    <main id="main-container" class="flex-1 flex overflow-hidden w-full relative">
+        
+        <!-- Sol Panel -->
+        <section id="left-panel" class="flex flex-col h-full bg-white relative" style="flex: 0 0 50%;">
+            <!-- Panel Araç Çubuğu -->
+            <div class="p-3 bg-gray-50 border-b border-gray-200 flex justify-between items-center shrink-0">
+                <span class="font-semibold text-gray-700 flex items-center gap-2">
+                    <span class="bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full text-xs">Sol</span>
+                    1. PDF Dokümanı
+                </span>
+                <div>
+                    <label for="pdf-upload-1" class="cursor-pointer bg-indigo-50 text-indigo-600 hover:bg-indigo-100 hover:text-indigo-800 transition px-4 py-2 rounded-md text-sm font-medium border border-indigo-200 shadow-sm">
+                        Dosya Seç
+                    </label>
+                    <input type="file" id="pdf-upload-1" accept="application/pdf" class="hidden">
+                </div>
+            </div>
+            
+            <!-- Panel İçeriği (PDF veya Bekleme Ekranı) -->
+            <div class="flex-1 relative flex items-center justify-center bg-gray-100 overflow-hidden">
+                <div id="placeholder-1" class="text-gray-400 flex flex-col items-center p-6 text-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="mb-4 opacity-50"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    <p class="text-lg font-medium text-gray-500">1. PDF'i Görüntülemek için Dosya Seçin</p>
+                    <p class="text-sm mt-2 max-w-xs">Karşılaştırma yapmak için ilk PDF belgenizi yukarıdaki butondan yükleyin.</p>
+                </div>
+                <!-- Iframe başlangıçta gizli -->
+                <iframe id="iframe-1" class="hidden absolute inset-0 w-full h-full" src=""></iframe>
+            </div>
+        </section>
+
+        <!-- Ayırıcı Çubuk (Yeniden Boyutlandırma için) -->
+        <div id="resizer" class="resizer shrink-0" title="Genişliği ayarlamak için sürükleyin"></div>
+
+        <!-- Sağ Panel -->
+        <section id="right-panel" class="flex flex-col h-full bg-white flex-1 relative min-w-0">
+            <!-- Panel Araç Çubuğu -->
+            <div class="p-3 bg-gray-50 border-b border-gray-200 flex justify-between items-center shrink-0">
+                <span class="font-semibold text-gray-700 flex items-center gap-2">
+                    <span class="bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full text-xs">Sağ</span>
+                    2. PDF Dokümanı
+                </span>
+                <div>
+                    <label for="pdf-upload-2" class="cursor-pointer bg-indigo-50 text-indigo-600 hover:bg-indigo-100 hover:text-indigo-800 transition px-4 py-2 rounded-md text-sm font-medium border border-indigo-200 shadow-sm">
+                        Dosya Seç
+                    </label>
+                    <input type="file" id="pdf-upload-2" accept="application/pdf" class="hidden">
+                </div>
+            </div>
+            
+            <!-- Panel İçeriği (PDF veya Bekleme Ekranı) -->
+            <div class="flex-1 relative flex items-center justify-center bg-gray-100 overflow-hidden">
+                <div id="placeholder-2" class="text-gray-400 flex flex-col items-center p-6 text-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="mb-4 opacity-50"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    <p class="text-lg font-medium text-gray-500">2. PDF'i Görüntülemek için Dosya Seçin</p>
+                    <p class="text-sm mt-2 max-w-xs">Eş zamanlı okuma ve karşılaştırma için ikinci PDF belgenizi buradan yükleyin.</p>
+                </div>
+                <!-- Iframe başlangıçta gizli -->
+                <iframe id="iframe-2" class="hidden absolute inset-0 w-full h-full" src=""></iframe>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // PDF Yükleme ve Gösterme İşlemi
+        function setupPdfUploader(inputId, iframeId, placeholderId) {
+            const input = document.getElementById(inputId);
+            const iframe = document.getElementById(iframeId);
+            const placeholder = document.getElementById(placeholderId);
+            let currentObjectUrl = null;
+
+            input.addEventListener('change', function(event) {
+                const file = event.target.files[0];
+                
+                // Eğer bir PDF seçildiyse
+                if (file && file.type === 'application/pdf') {
+                    // Bellek sızıntısını önlemek için eski URL'yi temizle
+                    if (currentObjectUrl) {
+                        URL.revokeObjectURL(currentObjectUrl);
+                    }
+
+                    // Yeni dosya için geçici bir tarayıcı URL'si oluştur
+                    currentObjectUrl = URL.createObjectURL(file);
+                    
+                    // URL'yi iframe'e kaynak olarak ver
+                    iframe.src = currentObjectUrl;
+                    
+                    // Bekleme ekranını gizle, iframe'i göster
+                    placeholder.classList.add('hidden');
+                    iframe.classList.remove('hidden');
+                }
+            });
+        }
+
+        // 1. ve 2. paneller için yükleyicileri başlat
+        setupPdfUploader('pdf-upload-1', 'iframe-1', 'placeholder-1');
+        setupPdfUploader('pdf-upload-2', 'iframe-2', 'placeholder-2');
+
+        // Panelleri Yeniden Boyutlandırma (Sürükleme) Mantığı
+        const resizer = document.getElementById('resizer');
+        const leftPanel = document.getElementById('left-panel');
+        const mainContainer = document.getElementById('main-container');
+        let isResizing = false;
+
+        resizer.addEventListener('mousedown', function(e) {
+            isResizing = true;
+            resizer.classList.add('active');
+            
+            // Sürükleme sırasında farenin iframe içine kaçmasını önlemek için bir sınıf ekliyoruz
+            mainContainer.classList.add('pointer-events-none-during-resize');
+        });
+
+        document.addEventListener('mousemove', function(e) {
+            if (!isResizing) return;
+
+            // Ekrandaki fare pozisyonuna göre sol panelin yüzdesini hesapla
+            const containerWidth = mainContainer.getBoundingClientRect().width;
+            let newLeftWidthPercentage = (e.clientX / containerWidth) * 100;
+
+            // Çok fazla küçültmeyi engellemek için sınırlar (Min %15, Max %85)
+            if (newLeftWidthPercentage < 15) newLeftWidthPercentage = 15;
+            if (newLeftWidthPercentage > 85) newLeftWidthPercentage = 85;
+
+            // Sol panele yeni genişliği uygula
+            leftPanel.style.flex = `0 0 ${newLeftWidthPercentage}%`;
+        });
+
+        document.addEventListener('mouseup', function(e) {
+            if (isResizing) {
+                isResizing = false;
+                resizer.classList.remove('active');
+                
+                // Sürükleme bitince iframe'lerin fare ile etkileşimini geri açıyoruz
+                mainContainer.classList.remove('pointer-events-none-during-resize');
+            }
+        });
+    </script>
+</body>
+</html>

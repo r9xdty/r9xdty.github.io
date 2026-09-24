@@ -17,6 +17,13 @@
   <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180.png">
+  <script>
+    (function () {
+      var root = document.documentElement;
+      root.classList.replace('no-js', 'js');
+      root.dataset.tab = /^#(software|software-top|live|apps|principles|builds|app-[\w-]+)$/.test(location.hash) ? 'software' : 'robotics';
+    })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
@@ -83,7 +90,7 @@
     }
     .eyebrow::before { content: ""; width: 24px; height: 1px; background: currentColor; }
     .section-index { color: var(--signal); font-variant-numeric: tabular-nums; }
-    .manifesto .section-index, .work .section-index, .experience .section-index { color: var(--signal-dark); }
+    .manifesto .section-index, .work .section-index, .experience .section-index, .sw-live .section-index, .sw-principles .section-index { color: var(--signal-dark); }
 
     .site-header {
       position: fixed; inset: 0 0 auto; z-index: 90;
@@ -94,7 +101,7 @@
       background: rgba(10, 11, 13, .78); border-color: var(--line);
       backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
     }
-    .nav { min-height: 76px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+    .nav { min-height: 76px; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 24px; }
     .brand {
       display: inline-flex; align-items: center; gap: 12px; min-width: 44px; min-height: 44px;
       font-family: var(--display); font-size: 13px; font-weight: 700; letter-spacing: -.01em;
@@ -109,7 +116,7 @@
     .brand-mark::before { width: 11px; height: 1px; }
     .brand-mark::after { width: 1px; height: 11px; }
     .brand:hover .brand-mark { border-color: var(--signal); transform: rotate(45deg); }
-    .nav-links { display: flex; align-items: center; gap: clamp(18px, 3vw, 40px); }
+    .nav-links { justify-self: end; display: flex; align-items: center; gap: clamp(18px, 3vw, 40px); }
     .nav-links a {
       position: relative; min-height: 44px; display: grid; place-items: center;
       color: #c7c7c1; font-size: 12px; font-weight: 600; letter-spacing: .06em;
@@ -524,6 +531,350 @@
       .js .reveal { opacity: 1; transform: none; }
       .project-card { transform: none !important; }
     }
+
+    /* ---------- Robotics / Software tabs ---------- */
+    .brand { justify-self: start; }
+    .tabs {
+      position: relative; justify-self: center; display: grid; grid-template-columns: 1fr 1fr; padding: 4px;
+      border: 1px solid var(--line); border-radius: 999px; background: rgba(10, 11, 13, .46);
+      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    }
+    .tab {
+      position: relative; z-index: 1; min-width: 108px; min-height: 38px; padding: 0 18px;
+      display: grid; place-items: center; border-radius: 999px;
+      color: #c7c7c1; font-size: 11px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase;
+      transition: color .35s var(--ease);
+    }
+    .tab:hover { color: var(--white); }
+    .tab[aria-selected="true"] { color: var(--ink); }
+    .tab-thumb {
+      position: absolute; z-index: 0; top: 4px; bottom: 4px; left: 4px; width: calc(50% - 4px);
+      border-radius: 999px; background: var(--paper); box-shadow: 0 6px 18px rgba(0, 0, 0, .28);
+      transition: transform .5s var(--ease);
+    }
+    [data-tab="software"] .tab-thumb { transform: translateX(100%); }
+    .no-js .tab-thumb { display: none; }
+    .js[data-tab="robotics"] .nav-links [data-panel="software"],
+    .js[data-tab="software"] .nav-links [data-panel="robotics"],
+    .no-js .nav-links [data-panel="software"] { display: none; }
+    .nav-cta .cta-mail { display: none; }
+    .js[data-tab="software"] #robotics, .js[data-tab="robotics"] #software { display: none; }
+    .js .panel { animation: panel-in .6s var(--ease) both; }
+    @keyframes panel-in { from { opacity: 0; } }
+
+    /* ---------- Software hero ---------- */
+    .sw-hero::before { background: radial-gradient(circle, rgba(158, 231, 245, .13), rgba(158, 231, 245, .03) 42%, transparent 68%); }
+    .sw-hero h1 { max-width: none; font-size: clamp(60px, 8.4vw, 132px); }
+    .sw-art .orbit.one { inset: 2% -8% 4% 4%; }
+    .device {
+      --depth: 1; --ry: 0deg; --rx: 0deg; --rz: 0deg;
+      position: absolute; z-index: 2; margin: 0; overflow: hidden; background: #08090a;
+      box-shadow: 0 0 0 1px rgba(242, 241, 235, .14), 0 50px 90px -34px rgba(0, 0, 0, .9);
+      transform: translate3d(calc(var(--field-x) * var(--depth)), calc(var(--field-y) * var(--depth)), 0) rotateX(var(--rx)) rotateY(var(--ry)) rotateZ(var(--rz));
+      transition: transform .6s var(--ease);
+    }
+    .device img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top center; opacity: 0; transition: opacity .9s var(--ease); }
+    .device img.is-on { opacity: 1; }
+    .device.browser { --depth: .7; --ry: -9deg; --rx: 3deg; left: 5%; top: 19%; width: 80%; aspect-ratio: 16 / 10.4; border-radius: 10px; }
+    .browser-bar {
+      position: relative; z-index: 2; height: 30px; display: flex; align-items: center; gap: 6px; padding: 0 12px;
+      background: #15171b; border-bottom: 1px solid rgba(255, 255, 255, .07);
+    }
+    .browser-bar i { width: 8px; height: 8px; border-radius: 50%; background: rgba(242, 241, 235, .2); }
+    .browser-bar span { margin-left: 10px; overflow: hidden; color: var(--muted); font-size: 9px; letter-spacing: .1em; white-space: nowrap; text-overflow: ellipsis; }
+    .browser-view { position: absolute; inset: 30px 0 0; }
+    .device.phone { --depth: 1.45; width: 23%; aspect-ratio: 390 / 844; padding: 6px; border-radius: 28px; background: #0c0d10; }
+    .device.phone .phone-view { position: absolute; inset: 6px; overflow: hidden; border-radius: 22px; background: #16181c; }
+    .device.phone.a { --ry: 8deg; --rz: -2deg; left: -1%; bottom: 3%; }
+    .device.phone.b { --depth: 1.15; --ry: -12deg; --rz: 2deg; right: 1%; bottom: 9%; width: 20%; }
+    .sw-art .field-readout { top: 8%; left: 3%; }
+    .sw-art .field-stage.one { left: 26%; bottom: 7%; }
+    .sw-art .field-stage.two { left: 56%; top: 8%; }
+    .sw-art .field-stage.three { right: 2%; top: 21%; }
+    .sw-art .field-stage.four { right: 25%; bottom: 3%; }
+
+    /* ---------- Live demo ---------- */
+    .sw-live { padding: clamp(110px, 13vw, 210px) 0; background: var(--paper); color: var(--ink); }
+    .sw-live .eyebrow, .sw-principles .eyebrow { max-width: none; margin: 0; color: var(--muted-dark); font-size: 11px; }
+    .live-card { display: grid; grid-template-columns: minmax(320px, .82fr) minmax(0, 1.18fr); overflow: hidden; background: var(--ink); color: var(--paper); }
+    .live-stage {
+      position: relative; isolation: isolate; display: grid; place-items: center; align-content: center; gap: 22px;
+      padding: clamp(46px, 5vw, 76px) 24px; border-right: 1px solid var(--line);
+      background: radial-gradient(circle at 50% 44%, rgba(255, 107, 44, .17), rgba(255, 107, 44, .03) 46%, transparent 68%), #08090a;
+    }
+    .live-stage::before {
+      content: ""; position: absolute; z-index: -1; inset: 0;
+      background-image: linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+      background-size: 56px 56px; mask-image: radial-gradient(circle at 50% 50%, #000 20%, transparent 72%);
+    }
+    .live-stage::after { content: ""; position: absolute; z-index: -1; width: 84%; aspect-ratio: 1; border: 1px dashed rgba(255, 107, 44, .28); border-radius: 50%; }
+    .phone-frame {
+      position: relative; width: clamp(252px, 23vw, 330px); aspect-ratio: 390 / 844; padding: 9px; border-radius: 44px;
+      background: #121418; box-shadow: 0 0 0 1px rgba(242, 241, 235, .2), 0 60px 100px -40px rgba(0, 0, 0, .95), inset 0 0 0 2px rgba(255, 255, 255, .04);
+    }
+    .phone-screen { position: relative; width: 100%; height: 100%; overflow: hidden; border-radius: 35px; background: #f6f5f1; }
+    .phone-screen img, .phone-screen iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; object-fit: cover; object-position: top; }
+    .phone-screen iframe { opacity: 0; transition: opacity .5s var(--ease); }
+    .phone-screen.is-live iframe { opacity: 1; }
+    .live-poster { position: absolute; inset: 0; z-index: 2; display: grid; align-items: end; justify-items: center; padding: 0 16px 26px; transition: opacity .4s var(--ease), visibility .4s; }
+    .live-poster::before { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 38%, rgba(10, 11, 13, .82)); }
+    .live-poster .button { position: relative; box-shadow: 0 16px 34px -12px rgba(255, 107, 44, .75); }
+    .phone-screen.is-live .live-poster { opacity: 0; visibility: hidden; }
+    .live-hint { max-width: 300px; margin: 0; color: var(--muted); font-size: 12px; line-height: 1.5; text-align: center; }
+    .live-hint b { color: var(--paper); font-weight: 600; }
+    .live-copy { display: flex; flex-direction: column; padding: clamp(40px, 5vw, 76px); }
+    .live-copy h3 {
+      margin: 38px 0 22px; font-family: var(--display); font-size: clamp(52px, 6vw, 92px);
+      font-variation-settings: "wdth" 92, "wght" 640; font-weight: 640; line-height: .92; letter-spacing: -.05em;
+    }
+    .live-copy > p { max-width: 58ch; margin: 0; color: #abb1b8; font-size: 17px; }
+    .live-copy > p strong { color: var(--paper); font-weight: 500; }
+    .live-copy .metric-grid { margin-top: 34px; }
+    .live-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: auto; padding-top: 36px; }
+
+    /* ---------- App grid ---------- */
+    .sw-apps { padding: clamp(110px, 13vw, 210px) 0; background: var(--ink); }
+    .sw-apps .method-head { margin-bottom: 54px; }
+    .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 30px; }
+    .filter {
+      min-height: 42px; padding: 0 16px; display: inline-flex; align-items: center; gap: 9px;
+      border: 1px solid var(--line); border-radius: 999px; background: transparent; color: #c7c7c1;
+      font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+      transition: background .25s, color .25s, border-color .25s;
+    }
+    .filter span { color: var(--muted); font-variant-numeric: tabular-nums; letter-spacing: 0; transition: color .25s; }
+    .filter:hover { border-color: rgba(242, 241, 235, .42); color: var(--white); }
+    .filter[aria-pressed="true"] { background: var(--paper); border-color: var(--paper); color: var(--ink); }
+    .filter[aria-pressed="true"] span { color: var(--signal-dark); }
+    .app-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-flow: dense; gap: 18px; }
+    .app-card {
+      --glow: rgba(255, 107, 44, .22);
+      position: relative; display: flex; flex-direction: column; min-width: 0;
+      border: 1px solid var(--line); background: var(--ink-soft);
+      transition: border-color .3s, transform .45s var(--ease);
+    }
+    .app-card[hidden] { display: none; }
+    .app-card.wide { grid-column: span 2; }
+    .app-card:hover { border-color: rgba(242, 241, 235, .34); transform: translateY(-4px); }
+    .app-card.is-entering { animation: card-in .5s var(--ease) both; }
+    @keyframes card-in { from { opacity: 0; transform: translateY(14px); } }
+    .app-media {
+      position: relative; aspect-ratio: 16 / 11; overflow: hidden; border-bottom: 1px solid var(--line);
+      background: radial-gradient(circle at 72% 18%, var(--glow), transparent 62%), radial-gradient(circle at 12% 110%, rgba(158, 231, 245, .08), transparent 50%), #0c0d10;
+    }
+    .app-card.wide .app-media { aspect-ratio: 16 / 7.6; }
+    .app-media::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(180deg, transparent 62%, rgba(17, 19, 23, .72)); }
+    .shot { position: absolute; overflow: hidden; background: #0b0c0e; transition: transform .6s var(--ease); }
+    .shot img, .shot video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top center; }
+    .shot.br { left: 8%; top: 12%; width: 104%; aspect-ratio: 16 / 10; border-radius: 9px 0 0 0; box-shadow: 0 0 0 1px rgba(242, 241, 235, .16), 0 36px 70px -30px rgba(0, 0, 0, .9); }
+    .shot.br::before {
+      content: ""; position: absolute; z-index: 2; inset: 0 0 auto; height: 22px; border-bottom: 1px solid rgba(255, 255, 255, .06);
+      background: radial-gradient(circle at 12px 11px, rgba(242,241,235,.24) 3px, transparent 3.6px), radial-gradient(circle at 24px 11px, rgba(242,241,235,.24) 3px, transparent 3.6px), radial-gradient(circle at 36px 11px, rgba(242,241,235,.24) 3px, transparent 3.6px), #15171b;
+    }
+    .shot.br img, .shot.br video { top: 22px; height: calc(100% - 22px); object-position: top left; }
+    .shot.ph { bottom: -22%; width: 31%; aspect-ratio: 390 / 844; padding: 5px; border-radius: 24px; box-shadow: 0 0 0 1px rgba(242, 241, 235, .18), 0 30px 60px -22px rgba(0, 0, 0, .9); }
+    .shot.ph img, .shot.ph video { inset: 5px; width: calc(100% - 10px); height: calc(100% - 10px); border-radius: 19px; }
+    .shot.ph:nth-child(1) { left: 15%; transform: rotate(-4deg); }
+    .shot.ph:nth-child(2) { left: 53%; bottom: -34%; transform: rotate(5deg); }
+    .app-card.wide .shot.ph { width: 17%; bottom: -28%; }
+    .app-card.wide .shot.ph:nth-child(1) { left: 12%; }
+    .app-card.wide .shot.ph:nth-child(2) { left: 41.5%; bottom: -12%; transform: rotate(0deg); }
+    .app-card.wide .shot.ph:nth-child(3) { left: 71%; transform: rotate(4deg); }
+    .app-card.wide .shot.br { left: 6%; width: 64%; }
+    .app-card.wide .shot.br + .shot.ph { left: auto; right: 7%; bottom: -26%; width: 19%; transform: rotate(3deg); }
+    .shot.slide { left: 7%; top: 11%; width: 86%; aspect-ratio: 16 / 9; border-radius: 4px; box-shadow: 0 0 0 1px rgba(242, 241, 235, .16), 0 36px 70px -30px rgba(0, 0, 0, .9); }
+    .app-card:hover .shot.br, .app-card:hover .shot.slide { transform: translateY(-8px); }
+    .app-card:hover .shot.ph:nth-child(1) { transform: rotate(-2deg) translateY(-12px); }
+    .app-card:hover .shot.ph:nth-child(2) { transform: rotate(3deg) translateY(-18px); }
+    .app-card.wide:hover .shot.ph:nth-child(2) { transform: translateY(-12px); }
+    .app-card:hover .shot.ph:nth-child(3) { transform: rotate(2deg) translateY(-14px); }
+    .app-card.wide:hover .shot.br + .shot.ph { transform: rotate(1deg) translateY(-14px); }
+    .app-info { display: flex; flex: 1; flex-direction: column; padding: 26px 26px 24px; }
+    .app-top { display: flex; align-items: center; justify-content: space-between; gap: 14px; color: var(--muted); font-size: 10px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; }
+    .status { display: inline-flex; flex: none; align-items: center; gap: 7px; color: #c7c7c1; }
+    .status i { width: 6px; height: 6px; border-radius: 50%; background: var(--signal); }
+    .status.live i { background: #9fe870; box-shadow: 0 0 12px #9fe870; }
+    .status.open i { background: var(--ice); }
+    .app-card h3 {
+      margin: 22px 0 12px; font-family: var(--display); font-size: clamp(29px, 2.5vw, 40px);
+      font-variation-settings: "wdth" 92, "wght" 620; font-weight: 620; line-height: .95; letter-spacing: -.04em;
+    }
+    .app-open { padding: 0; border: 0; background: none; color: inherit; font: inherit; letter-spacing: inherit; text-align: left; }
+    .app-open::after { content: ""; position: absolute; z-index: 3; inset: 0; }
+    .app-open:focus-visible { outline: none; }
+    .app-open:focus-visible::after { outline: 2px solid var(--signal); outline-offset: 3px; }
+    .app-card > .app-info > p { margin: 0; color: #aeb4bb; font-size: 15px; }
+    .app-card .tags { margin-top: 20px; }
+    .app-card .tag, .case-dialog .tag { border-color: var(--line); color: #c7c7c1; }
+    .app-more { display: inline-flex; align-items: center; gap: 8px; margin-top: auto; padding-top: 24px; color: var(--muted); font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; transition: color .25s; }
+    .app-more svg { width: 14px; transition: transform .3s var(--ease); }
+    .app-card:hover .app-more { color: var(--signal); }
+    .app-card:hover .app-more svg { transform: translateX(4px); }
+    .grid-note { margin: 26px 0 0; color: var(--muted); font-size: 13px; }
+
+    /* ---------- Case dialog ---------- */
+    .case-dialog {
+      --glow: rgba(255, 107, 44, .22);
+      width: min(1260px, calc(100vw - 40px)); max-width: none; height: min(860px, calc(100vh - 40px)); max-height: none;
+      margin: auto; padding: 0; overflow: hidden; border: 1px solid var(--line); background: var(--ink); color: var(--paper);
+    }
+    .case-dialog::backdrop { background: rgba(5, 6, 8, .8); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+    .case-dialog[open] { display: grid; grid-template-columns: minmax(0, 1.22fr) minmax(360px, .78fr); animation: case-in .45s var(--ease); }
+    @keyframes case-in { from { opacity: 0; transform: translateY(18px) scale(.985); } }
+    .case-close {
+      position: absolute; z-index: 6; top: 16px; right: 16px; width: 46px; height: 46px; display: grid; place-items: center;
+      border: 1px solid var(--line); border-radius: 50%; background: rgba(10, 11, 13, .72); color: var(--paper);
+      backdrop-filter: blur(10px); transition: background .2s, color .2s, transform .3s var(--ease);
+    }
+    .case-close:hover { background: var(--paper); color: var(--ink); transform: rotate(90deg); }
+    .case-close svg { width: 16px; }
+    .case-media {
+      position: relative; min-width: 0; min-height: 0; display: grid; grid-template-rows: minmax(0, 1fr) auto auto;
+      border-right: 1px solid var(--line);
+      background: radial-gradient(circle at 60% 30%, var(--glow), transparent 64%), #08090a;
+    }
+    .case-stage { position: relative; min-height: 0; display: grid; place-items: center; padding: 48px 70px 18px; }
+    .case-item { display: none; max-width: 100%; max-height: 100%; min-height: 0; }
+    .case-item.is-on { display: block; animation: panel-in .4s var(--ease) both; }
+    .case-item img, .case-item video { display: block; max-width: 100%; max-height: 100%; object-fit: contain; }
+    .case-item.br img, .case-item.br video, .case-item.slide img { border-radius: 8px; box-shadow: 0 0 0 1px rgba(242, 241, 235, .14), 0 40px 80px -36px rgba(0, 0, 0, .95); }
+    .case-item.ph { height: 100%; aspect-ratio: 390 / 844; padding: 7px; border-radius: 34px; background: #0c0d10; box-shadow: 0 0 0 1px rgba(242, 241, 235, .18), 0 40px 80px -36px rgba(0, 0, 0, .95); }
+    .case-item.ph img, .case-item.ph video { width: 100%; height: 100%; object-fit: cover; object-position: top; border-radius: 27px; }
+    .case-item.br, .case-item.slide { width: 100%; }
+    .case-item.br img, .case-item.br video, .case-item.slide img { width: 100%; height: auto; max-height: calc(min(860px, 100vh - 40px) - 190px); object-fit: contain; }
+    .case-caption { min-height: 1.5em; margin: -4px 24px 18px; color: var(--muted); font-size: 12px; text-align: center; }
+    .case-step {
+      position: absolute; z-index: 3; top: 50%; width: 46px; height: 46px; display: grid; place-items: center;
+      border: 1px solid var(--line); border-radius: 50%; background: rgba(10, 11, 13, .6); color: var(--paper);
+      transform: translateY(-50%); transition: background .2s, color .2s;
+    }
+    .case-step:hover { background: var(--paper); color: var(--ink); }
+    .case-step svg { width: 16px; }
+    .case-step.prev { left: 14px; }
+    .case-step.next { right: 14px; }
+    .case-thumbs { display: flex; justify-content: center; gap: 8px; overflow-x: auto; padding: 16px 20px 20px; scrollbar-width: none; }
+    .case-thumbs::-webkit-scrollbar { display: none; }
+    .case-thumb { position: relative; flex: none; height: 58px; padding: 0; overflow: hidden; border: 1px solid var(--line); background: #0b0c0e; opacity: .5; transition: opacity .2s, border-color .2s; }
+    .case-thumb img { height: 100%; width: auto; object-fit: cover; }
+    .case-thumb[aria-current="true"] { opacity: 1; border-color: var(--signal); }
+    .case-thumb:hover { opacity: .9; }
+    .case-thumb .play { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(10, 11, 13, .35); }
+    .case-thumb .play svg { width: 16px; color: var(--white); }
+    .case-body { min-height: 0; overflow-y: auto; padding: 64px 44px 44px; scrollbar-width: thin; scrollbar-color: rgba(242,241,235,.2) transparent; }
+    .case-body .eyebrow { color: var(--muted); }
+    .case-body h2 {
+      margin: 22px 0 18px; font-family: var(--display); font-size: clamp(44px, 4.6vw, 72px);
+      font-variation-settings: "wdth" 90, "wght" 660; font-weight: 660; line-height: .9; letter-spacing: -.055em;
+    }
+    .case-lede { margin: 0; color: #c9ced3; font-size: 17px; line-height: 1.55; }
+    .case-body h3 { margin: 34px 0 6px; color: var(--muted); font-size: 10px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; }
+    .case-points { margin: 0; padding: 0; list-style: none; counter-reset: point; }
+    .case-points li { position: relative; padding: 14px 0 14px 34px; border-bottom: 1px solid var(--line); color: #aeb4bb; font-size: 15px; counter-increment: point; }
+    .case-points li::before { content: counter(point, decimal-leading-zero); position: absolute; left: 0; top: 16px; color: var(--signal); font-size: 10px; font-weight: 600; letter-spacing: .1em; }
+    .case-points strong { color: var(--paper); font-weight: 500; }
+    .case-meta { display: grid; grid-template-columns: auto 1fr; gap: 12px 22px; margin: 0; font-size: 14px; }
+    .case-meta dt { padding-top: 3px; color: var(--muted); font-size: 10px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; }
+    .case-meta dd { margin: 0; color: #d8dbde; }
+    .case-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 34px; }
+    .case-note { margin: 18px 0 0; color: var(--muted); font-size: 12px; }
+    html.case-open { overflow: hidden; }
+
+    /* ---------- Principles ---------- */
+    .sw-principles { padding: clamp(110px, 14vw, 220px) 0; background: var(--paper); color: var(--ink); }
+    .principles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: 1px solid var(--line-dark); }
+    .principle { padding: 44px 48px 50px 0; border-bottom: 1px solid var(--line-dark); }
+    .principle:nth-child(even) { padding: 44px 0 50px 48px; border-left: 1px solid var(--line-dark); }
+    .principle-num { color: var(--signal-dark); font-size: 12px; font-weight: 600; letter-spacing: .15em; }
+    .principle h3 {
+      max-width: 15ch; margin: 18px 0 16px; font-family: var(--display); font-size: clamp(32px, 3.4vw, 52px);
+      font-variation-settings: "wdth" 90, "wght" 650; font-weight: 650; line-height: .94; letter-spacing: -.045em;
+    }
+    .principle p { max-width: 540px; margin: 0; color: var(--muted-dark); }
+    .principle p strong { color: var(--ink); font-weight: 600; }
+    .seen-in { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; margin-top: 24px; }
+    .seen-in > span:first-child { margin-right: 4px; color: var(--muted-dark); font-size: 10px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; }
+
+    /* ---------- Smaller builds ---------- */
+    .sw-builds { padding: clamp(110px, 13vw, 200px) 0; background: var(--ink); }
+    .sw-builds .layer h3 { line-height: 1; }
+    .sw-builds .layer-tags a { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; color: var(--paper); }
+    .sw-builds .layer-tags a:hover { color: var(--signal); }
+    .sw-builds .layer-tags svg { width: 14px; }
+
+    @media (min-width: 1200px) {
+      .nav { grid-template-columns: 1fr auto 1fr; }
+    }
+
+    @media (max-width: 1100px) {
+      .app-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .live-card { grid-template-columns: 1fr; }
+      .live-stage { border-right: 0; border-bottom: 1px solid var(--line); }
+      .case-dialog[open] { grid-template-columns: minmax(0, 1.1fr) minmax(330px, .9fr); }
+      .case-stage { padding-inline: 58px; }
+    }
+
+    @media (max-width: 960px) {
+      .nav-links a:not(.nav-cta) { display: none; }
+    }
+
+    @media (max-width: 800px) {
+      .nav { gap: 12px; }
+      .sw-art { margin-top: 10px; }
+      .sw-hero h1 { font-size: clamp(58px, 18vw, 100px); }
+      .device.browser { left: 8%; width: 84%; top: 14%; }
+      .device.phone.a { width: 26%; left: 4%; bottom: 2%; }
+      .device.phone.b { width: 23%; right: 4%; }
+      .sw-art .field-stage.two { left: 44%; top: 5%; }
+      .sw-art .field-stage.three { right: 5%; top: 11%; }
+      .principles { grid-template-columns: 1fr; }
+      .principle, .principle:nth-child(even) { padding: 38px 0 42px; border-left: 0; }
+      .case-dialog { width: 100vw; height: 100dvh; border: 0; }
+      .case-dialog[open] { display: block; overflow-y: auto; }
+      .case-media { height: 64svh; min-height: 420px; border-right: 0; border-bottom: 1px solid var(--line); }
+      .case-stage { padding: 58px 54px 10px; }
+      .case-item.br img, .case-item.br video, .case-item.slide img { max-height: calc(64svh - 150px); }
+      .case-body { overflow: visible; padding: 40px 22px 60px; }
+      .case-step { width: 40px; height: 40px; }
+      .case-step.prev { left: 8px; }
+      .case-step.next { right: 8px; }
+    }
+
+    @media (max-width: 640px) {
+      .app-grid { grid-template-columns: 1fr; }
+      .app-card.wide { grid-column: auto; }
+      .app-card.wide .app-media { aspect-ratio: 16 / 11; }
+      .app-card.wide .shot.ph { width: 31%; bottom: -22%; }
+      .app-card.wide .shot.ph:nth-child(1) { left: 15%; }
+      .app-card.wide .shot.ph:nth-child(2) { left: 53%; bottom: -34%; transform: rotate(5deg); }
+      .app-card.wide .shot.ph:nth-child(3) { display: none; }
+      .app-card.wide .shot.br { left: 8%; width: 104%; }
+      .app-card.wide .shot.br + .shot.ph { display: none; }
+      .filters { flex-wrap: nowrap; overflow-x: auto; margin-inline: calc(var(--pad) * -1); padding: 0 var(--pad) 4px; scrollbar-width: none; }
+      .filters::-webkit-scrollbar { display: none; }
+      .filter { flex: none; }
+      .live-copy { padding: 40px 24px 32px; }
+      .live-actions .button { flex: 1 1 100%; }
+    }
+
+    @media (max-width: 540px) {
+      .tab { min-width: 88px; padding: 0 12px; letter-spacing: .1em; }
+      .nav-cta { width: 44px; padding: 0 !important; justify-content: center; }
+      .nav-cta .cta-text, .nav-cta .cta-arrow { display: none; }
+      .nav-cta .cta-mail { display: block; width: 17px; }
+      .sw-art { min-height: 400px; }
+      .sw-art .field-stage.one { left: 30%; bottom: 3%; }
+      .sw-art .field-stage.four { display: none; }
+      .case-media { min-height: 380px; }
+      .case-stage { padding-inline: 46px; }
+    }
+
+    @media (max-width: 360px) {
+      .tab { min-width: 76px; padding: 0 9px; font-size: 10px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .app-card, .shot, .device { transform: none !important; }
+    }
   </style>
 </head>
 <body>
@@ -542,16 +893,25 @@
         <span class="brand-mark" aria-hidden="true"></span>
         <span class="brand-text">Mustafa Altuntaş</span>
       </a>
+      <div class="tabs" role="tablist" aria-label="Portfolio">
+        <a class="tab" role="tab" id="tab-robotics" href="#robotics" data-tab="robotics" aria-controls="robotics" aria-selected="true">Robotics</a>
+        <a class="tab" role="tab" id="tab-software" href="#software" data-tab="software" aria-controls="software" aria-selected="false">Software</a>
+        <span class="tab-thumb" aria-hidden="true"></span>
+      </div>
       <nav class="nav-links" aria-label="Main navigation">
-        <a href="#work">Work</a>
-        <a href="#method">Approach</a>
-        <a href="#experience">Experience</a>
-        <a class="nav-cta" href="mailto:mustafa.altuntas.201m5@gmail.com">Let's talk <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 16 16 4M7 4h9v9" stroke="currentColor" stroke-width="1.6"/></svg></a>
+        <a href="#work" data-panel="robotics">Work</a>
+        <a href="#method" data-panel="robotics">Approach</a>
+        <a href="#experience" data-panel="robotics">Experience</a>
+        <a href="#live" data-panel="software">Live demo</a>
+        <a href="#apps" data-panel="software">Apps</a>
+        <a href="#principles" data-panel="software">Principles</a>
+        <a class="nav-cta" href="mailto:mustafa.altuntas.201m5@gmail.com" aria-label="Let's talk — email Mustafa"><span class="cta-text">Let's talk</span> <svg class="cta-arrow" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 16 16 4M7 4h9v9" stroke="currentColor" stroke-width="1.6"/></svg><svg class="cta-mail" viewBox="0 0 20 20" fill="none" aria-hidden="true"><rect x="2.5" y="4.5" width="15" height="11" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="m3 5.5 7 5.5 7-5.5" stroke="currentColor" stroke-width="1.5"/></svg></a>
       </nav>
     </div>
   </header>
 
   <main id="main">
+    <div class="panel" id="robotics" role="tabpanel" aria-labelledby="tab-robotics">
     <section class="hero" id="top" aria-labelledby="hero-title">
       <div class="hero-inner shell">
         <div class="hero-copy">
@@ -672,6 +1032,205 @@
         </div>
       </div>
     </section>
+    </div>
+
+    <!-- software:start -->
+    <div class="panel" id="software" role="tabpanel" aria-labelledby="tab-software">
+    <section class="hero sw-hero" id="software-top" aria-labelledby="sw-hero-title">
+      <div class="hero-inner shell">
+        <div class="hero-copy">
+          <p class="eyebrow">Software engineer · product builder <span class="availability"><i aria-hidden="true"></i>Open to projects</span></p>
+          <h1 id="sw-hero-title"><span>I ship</span><span>software</span><span class="outline">people use.</span></h1>
+          <p class="hero-lede">Beyond robotics I build complete products: <strong>mobile apps, web platforms, AI tools</strong> and games. From the first conversation with the people who'll use them to the release build.</p>
+          <div class="hero-actions">
+            <a class="button primary" href="#live">Try the live demo <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="m5 7 5 5 5-5" stroke="currentColor" stroke-width="1.6"/></svg></a>
+            <a class="button" href="#apps">Browse all apps</a>
+          </div>
+        </div>
+
+        <div class="hero-art sw-art" id="swArt" aria-hidden="true">
+          <div class="orbit one"></div><div class="orbit two"></div><div class="orbit three"></div><i class="orbit-dot"></i>
+          <figure class="device browser">
+            <div class="browser-bar"><i></i><i></i><i></i><span id="swBrowserLabel">localhost:4311 — EOK</span></div>
+            <div class="browser-view" data-cycle="browser"></div>
+          </figure>
+          <figure class="device phone a"><div class="phone-view" data-cycle="phoneA"></div></figure>
+          <figure class="device phone b"><div class="phone-view" data-cycle="phoneB"></div></figure>
+          <div class="field-readout"><span>Now on screen</span><strong id="swState">EOK / Digital twins</strong></div>
+          <div class="field-stage one"><span>01</span>Discover</div><div class="field-stage two"><span>02</span>Design</div>
+          <div class="field-stage three"><span>03</span>Build</div><div class="field-stage four"><span>04</span>Ship</div>
+          <i class="field-corner a"></i><i class="field-corner b"></i>
+          <div class="hero-art-note"><i></i>Real screens · real builds</div>
+        </div>
+      </div>
+      <div class="scroll-cue"><span><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="m5 7 5 5 5-5" stroke="currentColor" stroke-width="1.5"/></svg></span>Scroll to explore</div>
+    </section>
+
+    <section class="sw-live" id="live" aria-labelledby="live-title">
+      <div class="shell">
+        <header class="section-head">
+          <div><p class="eyebrow reveal"><span class="section-index">01</span> Live demo</p><h2 class="reveal" id="live-title">Try it right here.</h2></div>
+          <p class="reveal">Kripros is open source and runs entirely in your browser: no sign-up, no server. Launch it inside the phone, or open it full screen.</p>
+        </header>
+
+        <article class="live-card reveal">
+          <div class="live-stage">
+            <div class="phone-frame">
+              <div class="phone-screen" id="livePhone">
+                <img src="assets/software/kripros/cover.webp" alt="Kripros overview screen with monthly income, spending and savings" loading="lazy" decoding="async">
+                <div class="live-poster"><button class="button primary" id="liveLaunch" type="button">Launch the live app <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="m7 5 8 5-8 5V5Z" fill="currentColor"/></svg></button></div>
+              </div>
+            </div>
+            <p class="live-hint">Tip: tap <b>“Örnek verilerle keşfet”</b> to start with a few months of sample data. The interface is in Turkish.</p>
+          </div>
+          <div class="live-copy">
+            <div class="feature-top"><span>Personal finance · Android, iOS, web</span><span>Live · MIT</span></div>
+            <h3>Kripros.</h3>
+            <p>A personal finance tracker for <strong>savings, spending and income</strong>, built with Expo and React Native. Budgets, recurring payments, goals, a calendar and charts drawn directly in SVG, and everything stays <strong>on the device</strong>.</p>
+            <div class="metric-grid" aria-label="Kripros highlights">
+              <div class="metric"><b>0 servers</b><span>fully on-device</span></div>
+              <div class="metric"><b>Kuruş</b><span>integer money math</span></div>
+              <div class="metric"><b>Raw SVG</b><span>charts, no chart library</span></div>
+              <div class="metric"><b>CI → Pages</b><span>lint, tests, web build</span></div>
+            </div>
+            <div class="live-actions">
+              <a class="button primary" href="/kripros/" target="_blank" rel="noopener">Open full screen <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 16 16 4M7 4h9v9" stroke="currentColor" stroke-width="1.6"/></svg></a>
+              <a class="button" href="https://github.com/r9xdty/kripros" target="_blank" rel="noreferrer">Source on GitHub <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 16 16 4M7 4h9v9" stroke="currentColor" stroke-width="1.6"/></svg></a>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="sw-apps" id="apps" aria-labelledby="apps-title">
+      <div class="shell">
+        <header class="method-head"><div><p class="eyebrow reveal"><span class="section-index">02</span> Selected apps</p><h2 class="reveal" id="apps-title">Products, tools &amp; games.</h2></div><p class="reveal">Most of these live in private repositories, so what you see are real screens and clips captured from the running apps. Open any card for the full story.</p></header>
+
+        <div class="filters reveal" role="group" aria-label="Filter apps" id="appFilters">
+          <button class="filter" type="button" data-filter="all" aria-pressed="true">All <span></span></button>
+          <button class="filter" type="button" data-filter="mobile" aria-pressed="false">Mobile <span></span></button>
+          <button class="filter" type="button" data-filter="web" aria-pressed="false">Web &amp; desktop <span></span></button>
+          <button class="filter" type="button" data-filter="ai" aria-pressed="false">AI <span></span></button>
+          <button class="filter" type="button" data-filter="business" aria-pressed="false">Business <span></span></button>
+          <button class="filter" type="button" data-filter="games" aria-pressed="false">Games <span></span></button>
+        </div>
+
+        <div class="app-grid" id="appGrid">
+          <article class="app-card" data-app="mobilya-takip" data-cats="web business" style="--glow: rgba(214, 160, 96, .26)">
+            <div class="app-media" aria-hidden="true">
+              <figure class="shot br"><video muted loop playsinline preload="none" poster="assets/software/mobilya-takip/demo-poster.webp" data-autoplay><source src="assets/software/mobilya-takip/demo.mp4" type="video/mp4"></video></figure>
+            </div>
+            <div class="app-info">
+              <div class="app-top"><span>Retail operations</span><span class="status"><i></i>In development</span></div>
+              <h3><button class="app-open" type="button" aria-haspopup="dialog">Mobilya Takip.</button></h3>
+              <p>Follows every made-to-order furniture item from the maker to the customer’s door, encrypted in the browser with no server at all.</p>
+              <div class="tags"><span class="tag">JavaScript</span><span class="tag">Web Crypto</span><span class="tag">AES-256</span><span class="tag">PBKDF2</span></div>
+              <span class="app-more" aria-hidden="true">View case <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10h12m-5-5 5 5-5 5" stroke="currentColor" stroke-width="1.6"/></svg></span>
+            </div>
+          </article>
+          <article class="app-card" data-app="baglanti-defteri" data-cats="mobile" style="--glow: rgba(120, 220, 160, .22)">
+            <div class="app-media" aria-hidden="true">
+              <figure class="shot ph"><img src="assets/software/baglanti-defteri/cover.webp" alt="" loading="lazy" decoding="async"></figure>
+              <figure class="shot ph"><video muted loop playsinline preload="none" poster="assets/software/baglanti-defteri/demo-poster.webp" data-autoplay><source src="assets/software/baglanti-defteri/demo.mp4" type="video/mp4"></video></figure>
+            </div>
+            <div class="app-info">
+              <div class="app-top"><span>Mobile · Personal CRM</span><span class="status"><i></i>Team · 2</span></div>
+              <h3><button class="app-open" type="button" aria-haspopup="dialog">Bağlantı Defteri.</button></h3>
+              <p>A private notebook for the people in your life: when you last talked, birthdays and gentle reminders.</p>
+              <div class="tags"><span class="tag">Expo</span><span class="tag">React Native</span><span class="tag">SQLite</span><span class="tag">Supabase</span></div>
+              <span class="app-more" aria-hidden="true">View case <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10h12m-5-5 5 5-5 5" stroke="currentColor" stroke-width="1.6"/></svg></span>
+            </div>
+          </article>
+          <article class="app-card" data-app="kripros" data-cats="mobile web" style="--glow: rgba(159, 232, 112, .22)">
+            <div class="app-media" aria-hidden="true">
+              <figure class="shot ph"><img src="assets/software/kripros/cover.webp" alt="" loading="lazy" decoding="async"></figure>
+              <figure class="shot ph"><video muted loop playsinline preload="none" poster="assets/software/kripros/demo-poster.webp" data-autoplay><source src="assets/software/kripros/demo.mp4" type="video/mp4"></video></figure>
+            </div>
+            <div class="app-info">
+              <div class="app-top"><span>Mobile · Finance</span><span class="status live"><i></i>Live demo</span></div>
+              <h3><button class="app-open" type="button" aria-haspopup="dialog">Kripros.</button></h3>
+              <p>Savings, spending and income on the device: budgets, recurring payments, goals and hand-drawn SVG charts.</p>
+              <div class="tags"><span class="tag">Expo</span><span class="tag">React Native</span><span class="tag">AsyncStorage</span><span class="tag">Jest</span></div>
+              <span class="app-more" aria-hidden="true">View case <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10h12m-5-5 5 5-5 5" stroke="currentColor" stroke-width="1.6"/></svg></span>
+            </div>
+          </article>
+          <article class="app-card" data-app="kule" data-cats="games" style="--glow: rgba(120, 200, 255, .22)">
+            <div class="app-media" aria-hidden="true">
+              <figure class="shot br"><img src="assets/software/kule/cover.webp" alt="" loading="lazy" decoding="async"></figure>
+            </div>
+            <div class="app-info">
+              <div class="app-top"><span>PC game</span><span class="status"><i></i>In development</span></div>
+              <h3><button class="app-open" type="button" aria-haspopup="dialog">KULE.</button></h3>
+              <p>A first-person parkour run up a single 100-floor tower: dashes, wall-runs, slides and traps that tighten floor by floor.</p>
+              <div class="tags"><span class="tag">Godot 4.3</span><span class="tag">GDScript</span></div>
+              <span class="app-more" aria-hidden="true">View case <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10h12m-5-5 5 5-5 5" stroke="currentColor" stroke-width="1.6"/></svg></span>
+            </div>
+          </article>
+          <article class="app-card" data-app="fitness-tracker" data-cats="ai mobile" style="--glow: rgba(255, 140, 60, .22)">
+            <div class="app-media" aria-hidden="true">
+              <figure class="shot slide"><img src="assets/software/fitness-tracker/cover.webp" alt="" loading="lazy" decoding="async"></figure>
+            </div>
+            <div class="app-info">
+              <div class="app-top"><span>Hackathon · ML</span><span class="status open"><i></i>Open source</span></div>
+              <h3><button class="app-open" type="button" aria-haspopup="dialog">Fitness Tracker.</button></h3>
+              <p>MathWorks Hackathon 2026: a phone in your pocket recognises what you’re doing and turns it into personal health metrics.</p>
+              <div class="tags"><span class="tag">MATLAB</span><span class="tag">Machine learning</span><span class="tag">Signal processing</span></div>
+              <span class="app-more" aria-hidden="true">View case <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10h12m-5-5 5 5-5 5" stroke="currentColor" stroke-width="1.6"/></svg></span>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="sw-principles" id="principles" aria-labelledby="principles-title">
+      <div class="shell">
+        <header class="section-head">
+          <div><p class="eyebrow reveal"><span class="section-index">03</span> How I build</p><h2 class="reveal" id="principles-title">Decisions you can find in the source.</h2></div>
+          <p class="reveal">The same few rules keep showing up across these repositories: not as slogans on a slide, but as code.</p>
+        </header>
+        <div class="principles">
+          <article class="principle reveal"><span class="principle-num">01</span><h3>Local-first, private by default.</h3><p>If an app doesn’t need a server, it doesn’t get one. <strong>Kripros</strong> never leaves the phone, <strong>Mobilya Takip</strong> encrypts every record in the browser with per-user wrapped keys, and the <strong>CAN assistant</strong> answers with the network unplugged.</p><div class="seen-in"><span>Seen in</span><span class="tag">Kripros</span><span class="tag">Mobilya Takip</span><span class="tag">CAN Bus Q&amp;A</span><span class="tag">Site Yönetim</span></div></article>
+          <article class="principle reveal"><span class="principle-num">02</span><h3>Money is an integer.</h3><p>Amounts are stored in <strong>kuruş</strong>, never as floating point. Balances are computed from the ledger rather than stored, and a correction is a reversing entry, not a delete.</p><div class="seen-in"><span>Seen in</span><span class="tag">Kripros</span><span class="tag">Site Yönetim</span></div></article>
+          <article class="principle reveal"><span class="principle-num">03</span><h3>Designed with the people who use it.</h3><p><strong>Mobilya Takip</strong> started from a discovery conversation in the shop, which is why it tracks missing parts rather than stock counts. <strong>Site Yönetim</strong> is shaped around 65+ volunteer managers: large type, plain Turkish, no jargon.</p><div class="seen-in"><span>Seen in</span><span class="tag">Mobilya Takip</span><span class="tag">Site Yönetim</span><span class="tag">Teklif Master</span></div></article>
+          <article class="principle reveal"><span class="principle-num">04</span><h3>AI proposes, people decide.</h3><p>Models draft, summarise and suggest; they don’t get the keys. <strong>EOK</strong>’s AI has no handle on a single device, <strong>Konsey</strong> merges nothing without approval, and the <strong>CAN assistant</strong> cites its source or refuses.</p><div class="seen-in"><span>Seen in</span><span class="tag">EOK</span><span class="tag">Konsey</span><span class="tag">CAN Bus Q&amp;A</span><span class="tag">telmi</span></div></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="sw-builds" id="builds" aria-labelledby="builds-title">
+      <div class="shell">
+        <header class="method-head"><div><p class="eyebrow reveal"><span class="section-index">04</span> Smaller builds</p><h2 class="reveal" id="builds-title">Also built.</h2></div><p class="reveal">Single-purpose tools and learning projects. Two of them you can open right now.</p></header>
+        <div class="layers">
+          <article class="layer reveal"><span class="layer-num">01</span><h3>Dual PDF Viewer</h3><p>Two PDFs side by side with a draggable divider, for reading and comparing. One HTML file; documents never leave the browser.</p><span class="layer-tags"><a href="/tools/ikili-pdf/" target="_blank" rel="noopener">Open tool <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 16 16 4M7 4h9v9" stroke="currentColor" stroke-width="1.6"/></svg></a></span></article>
+          <article class="layer reveal"><span class="layer-num">02</span><h3>E-commerce storefront</h3><p>An ASP.NET Core MVC shop with categories, cart, coupons, checkout and orders.</p><span class="layer-tags"><a href="https://github.com/r9xdty/e-commarce-web-site" target="_blank" rel="noreferrer">Source <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 16 16 4M7 4h9v9" stroke="currentColor" stroke-width="1.6"/></svg></a></span></article>
+          <article class="layer reveal"><span class="layer-num">03</span><h3>This website</h3><p>Hand-written HTML, CSS and JavaScript: a canvas motion field, scroll-driven kinematics, no framework.</p><span class="layer-tags"><a href="https://github.com/r9xdty/r9xdty.github.io" target="_blank" rel="noreferrer">Source <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 16 16 4M7 4h9v9" stroke="currentColor" stroke-width="1.6"/></svg></a></span></article>
+        </div>
+      </div>
+    </section>
+    </div>
+
+    <dialog class="case-dialog" id="caseDialog" aria-labelledby="caseTitle">
+      <button class="case-close" type="button" aria-label="Close"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15" stroke="currentColor" stroke-width="1.6"/></svg></button>
+      <div class="case-media">
+        <div class="case-stage" id="caseStage"></div>
+        <button class="case-step prev" type="button" aria-label="Previous screen"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="m12 4-6 6 6 6" stroke="currentColor" stroke-width="1.6"/></svg></button>
+        <button class="case-step next" type="button" aria-label="Next screen"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="m8 4 6 6-6 6" stroke="currentColor" stroke-width="1.6"/></svg></button>
+        <div class="case-thumbs" id="caseThumbs"></div>
+        <p class="case-caption" id="caseCaption" aria-live="polite"></p>
+      </div>
+      <div class="case-body">
+        <p class="eyebrow" id="caseEyebrow"></p>
+        <h2 id="caseTitle"></h2>
+        <p class="case-lede" id="caseLede"></p>
+        <h3>Highlights</h3>
+        <ol class="case-points" id="casePoints"></ol>
+        <h3>Details</h3>
+        <dl class="case-meta" id="caseMeta"></dl>
+        <div class="case-links" id="caseLinks"></div>
+        <p class="case-note" id="caseNote"></p>
+      </div>
+    </dialog>
+    <!-- software:end -->
 
     <section class="contact" id="contact" aria-labelledby="contact-title">
       <div class="contact-inner shell">
@@ -687,6 +1246,7 @@
     </section>
   </main>
 
+  <script type="application/json" id="swData">{"apps":{"gridsmash":{"name":"GridSmash","eyebrow":"Mobile game · Android & web","lede":"Drag blocks onto the grid, clear rows and columns, chain combos until the board ignites. A synthwave arcade cabinet in your pocket, built end to end: game feel, economy, accounts and release pipeline.","points":[],"meta":[["Platform","Android · Web"],["Stack","Flutter, Flame, Supabase"],["Team","Solo"],["Status","Play Store-ready"]],"links":[],"note":"Private repository. Screens were captured from a local build running on fictional demo data.","glow":"rgba(255, 79, 216, .3)","media":[]},"telmi":{"name":"telmi","eyebrow":"Mobile · AI meeting notes","lede":"","points":[],"meta":[["Platform","Android first · Web preview"],["Stack","Flutter, Python"],["Team","Solo"],["Status","MVP · Android APK"]],"links":[],"note":"Private repository. Screens were captured from a local build running on fictional demo data.","glow":"rgba(255, 196, 120, .24)","media":[]},"eok":{"name":"EOK","eyebrow":"Industrial platform · Web","lede":"","points":[],"meta":[["Platform","Web (single process)"],["Stack","Python, React, TypeScript, Tailwind"],["Team","Two developers"],["Status","Prototype on digital twins"]],"links":[],"note":"Private repository. Screens were captured from a local build running on fictional demo data.","glow":"rgba(158, 231, 245, .24)","media":[]},"konsey":{"name":"Konsey","eyebrow":"Developer tool · Local web UI + CLI","lede":"","points":[],"meta":[["Platform","Windows · local web UI"],["Stack","Node.js, TypeScript, SQLite"],["Team","Solo"],["Status","In use"]],"links":[],"note":"Private repository. Screens were captured from a local build running on fictional demo data.","glow":"rgba(160, 130, 255, .26)","media":[]},"site-yonetim":{"name":"Site Yönetim","eyebrow":"Accounting · Windows, Android, web demo","lede":"","points":[],"meta":[["Platform","Windows · Android · Web demo"],["Stack","Flutter, drift, Supabase"],["Team","Solo"],["Status","Pilot"]],"links":[],"note":"Private repository. Screens were captured from a local build running on fictional demo data.","glow":"rgba(90, 170, 255, .24)","media":[]},"mobilya-takip":{"name":"Mobilya Takip","eyebrow":"Retail operations · Browser app","lede":"","points":[],"meta":[["Platform","Any browser, offline"],["Stack","Vanilla JavaScript, Web Crypto API"],["Team","Solo"],["Status","In development"]],"links":[],"note":"Private repository. Screens were captured from a local build running on fictional demo data.","glow":"rgba(214, 160, 96, .26)","media":[{"type":"video","kind":"br","src":"assets/software/mobilya-takip/demo.mp4","poster":"assets/software/mobilya-takip/demo-poster.webp"},{"type":"image","kind":"br","src":"assets/software/mobilya-takip/cover.webp"},{"type":"image","kind":"br","src":"assets/software/mobilya-takip/shot-1.webp"},{"type":"image","kind":"br","src":"assets/software/mobilya-takip/shot-2.webp"},{"type":"image","kind":"br","src":"assets/software/mobilya-takip/shot-3.webp"},{"type":"image","kind":"br","src":"assets/software/mobilya-takip/shot-4.webp"}]},"baglanti-defteri":{"name":"Bağlantı Defteri","eyebrow":"Mobile · Personal relationships","lede":"","points":[],"meta":[["Platform","Android · iOS · Web"],["Stack","Expo, React Native, SQLite"],["Team","Two developers"],["Status","In development"]],"links":[],"note":"Private repository. Screens were captured from a local build running on fictional demo data.","glow":"rgba(120, 220, 160, .22)","media":[{"type":"video","kind":"ph","src":"assets/software/baglanti-defteri/demo.mp4","poster":"assets/software/baglanti-defteri/demo-poster.webp"},{"type":"image","kind":"ph","src":"assets/software/baglanti-defteri/cover.webp"},{"type":"image","kind":"ph","src":"assets/software/baglanti-defteri/shot-1.webp"},{"type":"image","kind":"ph","src":"assets/software/baglanti-defteri/shot-2.webp"},{"type":"image","kind":"ph","src":"assets/software/baglanti-defteri/shot-3.webp"},{"type":"image","kind":"ph","src":"assets/software/baglanti-defteri/shot-4.webp"}]},"kripros":{"name":"Kripros","eyebrow":"Mobile · Personal finance","lede":"A personal finance tracker for savings, spending and income, built with Expo and React Native. It runs fully on the device: no account, no server, no internet needed.","points":["<strong>Budgets</strong> per spending category, with a notice when a new record passes 80% or the limit.","<strong>Recurring income and spending</strong> are recorded when their day comes, even if the app was closed; the 31st becomes the last day of shorter months.","<strong>Charts drawn directly in SVG</strong>, without a chart library: grouped bars for 7 days, 5 weeks or 12 months, and a category donut.","<strong>Turkish number input</strong> reads 45,50, 1.250 and 1.250,75 correctly; totals are computed in kuruş, so there are no floating-point errors.","<strong>Backups</strong> are validated completely (format, version, every record) before anything on the device is replaced.","Large tables are split into <strong>16 storage buckets</strong>, so no value hits Android’s per-item limit and only the changed bucket is rewritten."],"meta":[["Platform","Android · iOS · Web"],["Stack","Expo SDK 53, React Native 0.79, React 19"],["Team","Solo"],["Status","Live demo · MIT licensed"]],"links":[{"label":"Open live demo","href":"/kripros/","primary":true},{"label":"Source on GitHub","href":"https://github.com/r9xdty/kripros"}],"note":"","glow":"rgba(159, 232, 112, .22)","media":[{"type":"video","kind":"ph","src":"assets/software/kripros/demo.mp4","poster":"assets/software/kripros/demo-poster.webp"},{"type":"image","kind":"ph","src":"assets/software/kripros/cover.webp"},{"type":"image","kind":"ph","src":"assets/software/kripros/shot-1.webp"},{"type":"image","kind":"ph","src":"assets/software/kripros/shot-2.webp"},{"type":"image","kind":"ph","src":"assets/software/kripros/shot-3.webp"},{"type":"image","kind":"ph","src":"assets/software/kripros/shot-4.webp"}]},"ozetleai":{"name":"ÖzetleAI","eyebrow":"SaaS · Document summaries","lede":"","points":[],"meta":[["Platform","Web"],["Stack","Next.js 14, TypeScript, Tailwind, Supabase"],["Team","Solo"],["Status","MVP"]],"links":[],"note":"Private repository. Screens were captured from a local build running on fictional demo data.","glow":"rgba(120, 140, 255, .24)","media":[]},"teklif-master":{"name":"Teklif Master","eyebrow":"Business tool · Web","lede":"","points":[],"meta":[["Platform","Web"],["Stack","React, Tailwind, Firebase, Gemini"],["Team","Solo"],["Status","Used in-house"]],"links":[],"note":"Private repository. Screens were captured from a local build running on fictional demo data.","glow":"rgba(255, 107, 44, .24)","media":[]},"is-emri":{"name":"İş Emri","eyebrow":"Business tool · Web","lede":"","points":[],"meta":[["Platform","Web"],["Stack","React, TypeScript, Vite"],["Team","Solo"],["Status","Prototype"]],"links":[],"note":"Private repository. Screens were captured from a local build running on fictional demo data.","glow":"rgba(255, 170, 60, .22)","media":[]},"altuntas-oyunlari":{"name":"Altuntaş Oyunları","eyebrow":"Mobile · Family games","lede":"","points":[],"meta":[["Platform","Android · iOS"],["Stack","Expo, React Native"],["Team","Solo"],["Status","MVP"]],"links":[],"note":"Private repository. Screens were captured from a local build running on fictional demo data.","glow":"rgba(255, 90, 120, .24)","media":[]},"kule":{"name":"KULE","eyebrow":"PC game · First-person parkour","lede":"","points":[],"meta":[["Platform","PC"],["Stack","Godot 4.3, GDScript"],["Team","Solo"],["Status","In development"]],"links":[],"note":"Private repository. Screens were captured from a local build running on fictional demo data.","glow":"rgba(120, 200, 255, .22)","media":[{"type":"image","kind":"br","src":"assets/software/kule/cover.webp"},{"type":"image","kind":"br","src":"assets/software/kule/shot-1.webp"},{"type":"image","kind":"br","src":"assets/software/kule/shot-2.webp"},{"type":"image","kind":"br","src":"assets/software/kule/shot-3.webp"}]},"can-assistant":{"name":"CAN Bus Q&A","eyebrow":"Offline AI · Desktop","lede":"","points":[],"meta":[["Platform","Windows laptop, fully offline"],["Stack","Python, Foundry Local, SQLite, Streamlit"],["Team","Solo"],["Status","Open source"]],"links":[{"label":"Source on GitHub","href":"https://github.com/r9xdty/Offline-CAN-Bus-Embedded-Firmware-Q-A-Assistant","primary":true}],"note":"","glow":"rgba(158, 231, 245, .2)","media":[]},"fitness-tracker":{"name":"Fitness Tracker","eyebrow":"Hackathon · Machine learning","lede":"","points":[],"meta":[["Platform","MATLAB Mobile + MATLAB"],["Stack","MATLAB, Statistics & ML Toolbox"],["Team","Three developers"],["Status","MathWorks Hackathon 2026"]],"links":[{"label":"Source on GitHub","href":"https://github.com/r9xdty/fitness_tracking_app","primary":true}],"note":"","glow":"rgba(255, 140, 60, .22)","media":[{"type":"image","kind":"slide","src":"assets/software/fitness-tracker/cover.webp"},{"type":"image","kind":"slide","src":"assets/software/fitness-tracker/shot-1.webp"},{"type":"image","kind":"slide","src":"assets/software/fitness-tracker/shot-2.webp"},{"type":"image","kind":"slide","src":"assets/software/fitness-tracker/shot-3.webp"}]}},"hero":{"browser":[{"slug":"mobilya-takip","label":"Mobilya Takip / Orders","url":"mobilya-takip — Bugün","src":"assets/software/mobilya-takip/cover.webp"}],"phoneA":[{"slug":"kripros","src":"assets/software/kripros/cover.webp"},{"slug":"baglanti-defteri","src":"assets/software/baglanti-defteri/cover.webp"}],"phoneB":[]}}</script>
   <script>
     document.documentElement.classList.replace('no-js', 'js');
     const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -934,6 +1494,297 @@
         });
         card.addEventListener('pointerleave', () => { card.style.setProperty('--ry', '0deg'); card.style.setProperty('--rx', '0deg'); });
       });
+    }
+    // ---------- Robotics / Software tabs ----------
+    {
+      const root = document.documentElement;
+      const panels = { robotics: document.getElementById('robotics'), software: document.getElementById('software') };
+      const tabs = [...document.querySelectorAll('.tab')];
+      const titles = { robotics: document.title, software: 'Mustafa Altuntaş — Software & Apps' };
+      const swData = JSON.parse(document.getElementById('swData').textContent);
+      const dialog = document.getElementById('caseDialog');
+      let softwareReady = false;
+
+      const panelOf = hash => {
+        const id = decodeURIComponent((hash || '').replace(/^#/, ''));
+        if (!id) return null;
+        if (panels[id]) return id;
+        if (/^app-/.test(id)) return 'software';
+        const target = document.getElementById(id);
+        if (!target) return null;
+        return panels.software.contains(target) ? 'software' : panels.robotics.contains(target) ? 'robotics' : null;
+      };
+
+      function setTab(name) {
+        const changed = root.dataset.tab !== name;
+        root.dataset.tab = name;
+        tabs.forEach(tab => {
+          const on = tab.dataset.tab === name;
+          tab.setAttribute('aria-selected', String(on));
+          tab.tabIndex = on ? 0 : -1;
+        });
+        document.title = titles[name];
+        if (name === 'software') initSoftware();
+        if (changed) dispatchEvent(new Event('resize'));
+        return changed;
+      }
+
+      function go(name) {
+        setTab(name);
+        history.pushState(null, '', name === 'software' ? '#software' : location.pathname + location.search);
+        scrollTo({ top: 0, behavior: 'instant' });
+      }
+
+      tabs.forEach(tab => {
+        tab.addEventListener('click', event => {
+          event.preventDefault();
+          if (root.dataset.tab === tab.dataset.tab) scrollTo({ top: 0, behavior: reducedMotion ? 'instant' : 'smooth' });
+          else go(tab.dataset.tab);
+        });
+        tab.addEventListener('keydown', event => {
+          if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+          event.preventDefault();
+          const next = tabs[(tabs.indexOf(tab) + (event.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length];
+          next.focus();
+          if (next.dataset.tab !== root.dataset.tab) go(next.dataset.tab);
+        });
+      });
+      document.querySelector('[data-tab="software"].tab').addEventListener('pointerenter', () => initSoftware(), { once: true });
+      document.querySelector('.brand').addEventListener('click', event => {
+        event.preventDefault();
+        scrollTo({ top: 0, behavior: reducedMotion ? 'instant' : 'smooth' });
+      });
+
+      function route() {
+        const id = decodeURIComponent(location.hash.slice(1));
+        const changed = setTab(panelOf(location.hash) || 'robotics');
+        const caseSlug = /^app-(.+)$/.exec(id)?.[1];
+        if (caseSlug && swData.apps[caseSlug]) {
+          if (!dialog.open) openCase(caseSlug, false);
+          return;
+        }
+        if (dialog.open) dialog.close();
+        if (id && !panels[id]) {
+          const target = document.getElementById(id);
+          if (target && changed) requestAnimationFrame(() => target.scrollIntoView());
+        } else if (changed) scrollTo({ top: 0, behavior: 'instant' });
+      }
+      addEventListener('popstate', route);
+      addEventListener('hashchange', route);
+
+      // ---------- Software hero: real screens cycling in the device stack ----------
+      const swArt = document.getElementById('swArt');
+      const swState = document.getElementById('swState');
+      const swBrowserLabel = document.getElementById('swBrowserLabel');
+      const cycles = [...document.querySelectorAll('[data-cycle]')].map(el => ({ el, items: swData.hero[el.dataset.cycle] || [], imgs: [], index: -1, key: el.dataset.cycle }));
+      let cycleTimer, cycleTick = 0, artVisible = false;
+
+      function showCycle(cycle, index) {
+        if (!cycle.items.length) return;
+        cycle.index = index % cycle.items.length;
+        const item = cycle.items[cycle.index];
+        let image = cycle.imgs[cycle.index];
+        if (!image) {
+          image = new Image();
+          image.alt = '';
+          image.decoding = 'async';
+          image.src = item.src;
+          cycle.el.append(image);
+          cycle.imgs[cycle.index] = image;
+        }
+        const reveal = () => cycle.imgs.forEach(other => other?.classList.toggle('is-on', other === image));
+        if (image.complete) reveal(); else image.addEventListener('load', reveal, { once: true });
+        if (cycle.key === 'browser') {
+          swState.textContent = item.label;
+          swBrowserLabel.textContent = item.url;
+        }
+      }
+
+      function runCycle() {
+        clearInterval(cycleTimer);
+        if (reducedMotion || !artVisible || root.dataset.tab !== 'software') return;
+        cycleTimer = setInterval(() => {
+          const cycle = cycles[cycleTick++ % cycles.length];
+          showCycle(cycle, cycle.index + 1);
+        }, 1250);
+      }
+
+      function initSoftware() {
+        if (softwareReady) return;
+        softwareReady = true;
+        cycles.forEach(cycle => showCycle(cycle, 0));
+      }
+
+      new IntersectionObserver(([entry]) => { artVisible = entry.isIntersecting; runCycle(); }, { threshold: .15 }).observe(swArt);
+
+      if (!reducedMotion && matchMedia('(pointer:fine)').matches) {
+        swArt.addEventListener('pointermove', event => {
+          const rect = swArt.getBoundingClientRect();
+          swArt.style.setProperty('--field-x', `${((event.clientX - rect.left) / rect.width - .5) * 16}px`);
+          swArt.style.setProperty('--field-y', `${((event.clientY - rect.top) / rect.height - .5) * 12}px`);
+        });
+        swArt.addEventListener('pointerleave', () => { swArt.style.setProperty('--field-x', '0px'); swArt.style.setProperty('--field-y', '0px'); });
+      }
+
+      // ---------- Live demo inside the phone ----------
+      const livePhone = document.getElementById('livePhone');
+      const liveLaunch = document.getElementById('liveLaunch');
+      liveLaunch.addEventListener('click', () => {
+        if (livePhone.querySelector('iframe')) return;
+        liveLaunch.firstChild.textContent = 'Starting… ';
+        const frame = document.createElement('iframe');
+        frame.title = 'Kripros live demo';
+        frame.src = '/kripros/';
+        const ready = () => { livePhone.classList.add('is-live'); frame.focus(); };
+        frame.addEventListener('load', ready, { once: true });
+        setTimeout(ready, 8000);
+        livePhone.append(frame);
+      });
+
+      // ---------- App filters ----------
+      const cards = [...document.querySelectorAll('.app-card')];
+      const filters = [...document.querySelectorAll('.filter')];
+      const inCategory = (card, filter) => filter === 'all' || card.dataset.cats.split(' ').includes(filter);
+      filters.forEach(button => {
+        const filter = button.dataset.filter;
+        button.querySelector('span').textContent = cards.filter(card => inCategory(card, filter)).length;
+        button.addEventListener('click', () => {
+          filters.forEach(other => other.setAttribute('aria-pressed', String(other === button)));
+          cards.forEach(card => {
+            const show = inCategory(card, filter);
+            card.hidden = !show;
+            card.classList.remove('is-entering');
+            if (show && !reducedMotion) { void card.offsetWidth; card.classList.add('is-entering'); }
+          });
+        });
+      });
+
+      const autoVideos = new IntersectionObserver(entries => entries.forEach(({ target, isIntersecting }) => {
+        if (isIntersecting && !reducedMotion) target.play().catch(() => {}); else target.pause();
+      }), { threshold: .4 });
+      document.querySelectorAll('video[data-autoplay]').forEach(video => autoVideos.observe(video));
+
+      // ---------- Case dialog ----------
+      const stage = document.getElementById('caseStage');
+      const thumbs = document.getElementById('caseThumbs');
+      const caption = document.getElementById('caseCaption');
+      const stepButtons = [...dialog.querySelectorAll('.case-step')];
+      const external = '<svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 16 16 4M7 4h9v9" stroke="currentColor" stroke-width="1.6"/></svg>';
+      let caseItems = [], caseIndex = 0, caseSlug = null, casePushed = false;
+
+      function mediaElement(item, name) {
+        const figure = document.createElement('figure');
+        figure.className = `case-item ${item.kind}`;
+        if (item.type === 'video') {
+          const video = document.createElement('video');
+          Object.assign(video, { muted: true, loop: true, playsInline: true, preload: 'none', poster: item.poster || '' });
+          video.src = item.src;
+          video.setAttribute('aria-label', item.caption || `${name} demo`);
+          figure.append(video);
+        } else {
+          const image = new Image();
+          image.decoding = 'async';
+          image.alt = item.caption || `${name} screen`;
+          image.src = item.src;
+          figure.append(image);
+        }
+        return figure;
+      }
+
+      function showItem(index) {
+        if (!caseItems.length) return;
+        caseIndex = (index + caseItems.length) % caseItems.length;
+        caseItems.forEach((element, i) => {
+          const on = i === caseIndex;
+          element.classList.toggle('is-on', on);
+          const video = element.querySelector('video');
+          if (video) { if (on && !reducedMotion) video.play().catch(() => {}); else video.pause(); }
+        });
+        [...thumbs.children].forEach((thumb, i) => thumb.setAttribute('aria-current', String(i === caseIndex)));
+        thumbs.children[caseIndex]?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+        caption.textContent = swData.apps[caseSlug].media[caseIndex]?.caption || '';
+      }
+
+      function openCase(slug, push = true) {
+        const app = swData.apps[slug];
+        if (!app) return;
+        caseSlug = slug;
+        dialog.style.setProperty('--glow', app.glow);
+        document.getElementById('caseEyebrow').textContent = app.eyebrow;
+        document.getElementById('caseTitle').textContent = `${app.name}.`;
+        const lede = document.getElementById('caseLede');
+        lede.innerHTML = app.lede;
+        lede.hidden = !app.lede;
+        const points = document.getElementById('casePoints');
+        points.innerHTML = app.points.map(point => `<li>${point}</li>`).join('');
+        points.previousElementSibling.hidden = points.hidden = !app.points.length;
+        document.getElementById('caseMeta').innerHTML = app.meta.map(([term, value]) => `<dt>${term}</dt><dd>${value}</dd>`).join('');
+        document.getElementById('caseLinks').innerHTML = app.links.map(link =>
+          `<a class="button${link.primary ? ' primary' : ''}" href="${link.href}" target="_blank" rel="${link.href.startsWith('http') ? 'noreferrer' : 'noopener'}">${link.label} ${external}</a>`).join('');
+        const note = document.getElementById('caseNote');
+        note.textContent = app.note;
+        note.hidden = !app.note;
+
+        stage.replaceChildren();
+        thumbs.replaceChildren();
+        caseItems = app.media.map((item, i) => {
+          const element = mediaElement(item, app.name);
+          stage.append(element);
+          const thumb = document.createElement('button');
+          thumb.type = 'button';
+          thumb.className = 'case-thumb';
+          thumb.setAttribute('aria-label', item.caption || `Screen ${i + 1}`);
+          const preview = new Image();
+          preview.alt = '';
+          preview.loading = 'lazy';
+          preview.src = item.type === 'video' ? (item.poster || '') : item.src;
+          thumb.append(preview);
+          if (item.type === 'video') thumb.insertAdjacentHTML('beforeend', '<span class="play"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 5 8 5-8 5V5Z" fill="currentColor"/></svg></span>');
+          thumb.addEventListener('click', () => showItem(i));
+          thumbs.append(thumb);
+          return element;
+        });
+        thumbs.hidden = caseItems.length < 2;
+        stepButtons.forEach(button => { button.hidden = caseItems.length < 2; });
+
+        root.classList.add('case-open');
+        if (!dialog.open) dialog.showModal();
+        dialog.querySelector('.case-body').scrollTop = 0;
+        showItem(0);
+        casePushed = push;
+        if (push) history.pushState(null, '', `#app-${slug}`);
+      }
+
+      dialog.addEventListener('close', () => {
+        root.classList.remove('case-open');
+        caseItems.forEach(element => element.querySelector('video')?.pause());
+        if (location.hash === `#app-${caseSlug}`) {
+          if (casePushed) history.back();
+          else history.replaceState(null, '', '#apps');
+        }
+        const card = document.querySelector(`.app-card[data-app="${caseSlug}"] .app-open`);
+        if (card && !casePushed) card.scrollIntoView({ block: 'center' });
+        card?.focus({ preventScroll: true });
+      });
+      dialog.querySelector('.case-close').addEventListener('click', () => dialog.close());
+      dialog.addEventListener('click', event => { if (event.target === dialog) dialog.close(); });
+      stepButtons.forEach(button => button.addEventListener('click', () => showItem(caseIndex + (button.classList.contains('next') ? 1 : -1))));
+      dialog.addEventListener('keydown', event => {
+        if (event.target.closest('a, .case-close')) return;
+        if (event.key === 'ArrowRight') { event.preventDefault(); showItem(caseIndex + 1); }
+        if (event.key === 'ArrowLeft') { event.preventDefault(); showItem(caseIndex - 1); }
+      });
+      let swipeX = null;
+      stage.addEventListener('pointerdown', event => { swipeX = event.clientX; });
+      stage.addEventListener('pointerup', event => {
+        if (swipeX === null) return;
+        const dx = event.clientX - swipeX;
+        swipeX = null;
+        if (Math.abs(dx) > 50) showItem(caseIndex + (dx < 0 ? 1 : -1));
+      });
+      cards.forEach(card => card.querySelector('.app-open').addEventListener('click', () => openCase(card.dataset.app)));
+
+      route();
     }
     document.getElementById('year').textContent = new Date().getFullYear();
   </script>
