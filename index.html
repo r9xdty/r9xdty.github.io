@@ -881,6 +881,39 @@
     @media (prefers-reduced-motion: reduce) {
       .app-card, .shot, .device { transform: none !important; }
     }
+
+    /* ---------- Robotics: weld path feature with a screen gallery ---------- */
+    .feature + .feature { margin-top: 18px; }
+    .gallery-stage { background: #08090a; }
+    .gallery-slide { position: absolute; inset: 0; margin: 0; opacity: 0; transition: opacity .8s var(--ease); }
+    .gallery-slide.is-on { opacity: 1; }
+    .gallery-slide img, .gallery-slide video { width: 100%; height: 100%; object-fit: cover; }
+    .gallery-progress { position: absolute; z-index: 2; inset: 0 0 auto; height: 2px; background: rgba(255, 255, 255, .08); }
+    .gallery-progress i { display: block; width: 100%; height: 100%; background: var(--signal); transform: scaleX(0); transform-origin: left; }
+    .gallery-bar { display: flex; gap: 8px; overflow-x: auto; padding: 16px clamp(20px, 3vw, 34px); border-top: 1px solid var(--line); scrollbar-width: none; }
+    .gallery-bar::-webkit-scrollbar { display: none; }
+    .gallery-tab {
+      flex: none; min-height: 40px; padding: 0 15px; display: inline-flex; align-items: center; gap: 9px;
+      border: 1px solid var(--line); border-radius: 999px; background: transparent; color: #c7c7c1;
+      font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+      transition: background .25s, color .25s, border-color .25s;
+    }
+    .gallery-tab span { color: var(--signal); font-variant-numeric: tabular-nums; }
+    .gallery-tab:hover { border-color: rgba(242, 241, 235, .42); color: var(--white); }
+    .gallery-tab[aria-selected="true"] { background: var(--paper); border-color: var(--paper); color: var(--ink); }
+    .gallery-tab[aria-selected="true"] span { color: var(--signal-dark); }
+    .feature-status { display: flex; align-items: flex-start; gap: 12px; max-width: 58ch; margin: 26px 0 0; padding: 14px 16px; border: 1px solid rgba(255, 107, 44, .38); background: rgba(255, 107, 44, .08); color: #d8dbde; font-size: 14px; line-height: 1.5; }
+    .feature-status i { flex: none; width: 8px; height: 8px; margin-top: 6px; border-radius: 50%; background: var(--signal); box-shadow: 0 0 12px var(--signal); }
+    .feature-status strong { color: var(--paper); font-weight: 600; }
+    .project-grid.two { grid-template-columns: repeat(2, 1fr); }
+    @media (max-width: 1100px) {
+      .project-grid.two .project-card:last-child { grid-column: auto; min-height: 590px; }
+    }
+    @media (max-width: 800px) {
+      .project-grid.two .project-card:last-child { min-height: 570px; }
+      .gallery-bar { padding: 12px 16px; }
+      .gallery-tab { min-height: 36px; padding: 0 12px; }
+    }
   </style>
 </head>
 <body>
@@ -994,13 +1027,27 @@
           </div>
         </article>
 
+        <article class="feature feature-weld reveal" data-gallery>
+          <div class="feature-media gallery-stage">
+<!--WELD-SLIDES-->
+            <div class="gallery-progress" aria-hidden="true"><i></i></div>
+          </div>
+          <div class="gallery-bar" role="tablist" aria-label="Weld path system screens">
+<!--WELD-TABS-->
+          </div>
+          <div class="feature-copy">
+            <div>
+              <div class="feature-top"><span>02 — Industrial system</span><span>Real CR10A</span></div>
+              <h3>CAD-to-robot weld path.</h3>
+              <p>Give it a STEP file and it finds the <strong>weld seams</strong>, plans an oriented, sequenced toolpath, aligns it to the real part with a camera and drives a <strong>Dobot CR10A</strong> over the controller&rsquo;s own TCP/IP protocol. Every step is rule-based and explainable, and eight pre-flight checks can refuse a run <strong>before the first motion command</strong>.</p>
+              <p class="feature-status"><i aria-hidden="true"></i><span><strong>TÜBİTAK 1707:</strong> the system is now at the application stage as the core of an order-based industrial R&amp;D project.</span></p>
+            </div>
+            <div class="metric-grid" aria-label="Project facts"><div class="metric"><b>42 / 42</b><span>waypoints flown on a real CR10A</span></div><div class="metric"><b>8 gates</b><span>refuse before any motion</span></div><div class="metric"><b>5,400+</b><span>automated tests</span></div><div class="metric"><b>0 ML</b><span>rule-based, explainable</span></div></div>
+          </div>
+        </article>
+
         <p class="card-hint" aria-hidden="true">Swipe to explore</p>
-        <div class="project-grid">
-          <article class="project-card reveal" data-tilt>
-            <div class="project-card-top"><span>02 — Client system</span><span>Real CR10A</span></div>
-            <div class="project-visual" aria-hidden="true"><svg viewBox="0 0 420 220"><path class="weld-line" d="M34 165c72-52 120 15 182-34s104-76 170-63"/><path class="weld-live" d="M96 139c48-10 74 19 120-8s67-54 110-61"/><path class="module-line" d="M70 181 171 102l98 7" stroke-width="18" stroke-linecap="round"/><circle class="weld-joint" cx="70" cy="181" r="15"/><circle class="weld-joint" cx="171" cy="102" r="13"/><circle class="weld-joint" cx="269" cy="109" r="11"/><circle class="module-node live" cx="326" cy="70" r="7"/></svg></div>
-            <h3>CAD-to-robot weld path.</h3><p>CAD geometry becomes an oriented, collision-checked path aligned to the real part and driven on a Dobot CR10A.</p><div class="tags"><span class="tag">OpenCASCADE</span><span class="tag">Open3D</span><span class="tag">IK</span><span class="tag">CR10A</span></div>
-          </article>
+        <div class="project-grid two">
           <article class="project-card reveal" data-tilt>
             <div class="project-card-top"><span>03 — Personal</span><span>Hardware</span></div>
             <div class="project-visual" aria-hidden="true"><svg viewBox="0 0 420 220"><circle class="motor-ring" cx="210" cy="110" r="88"/><circle class="motor-ring" cx="210" cy="110" r="50"/><path class="motor-coil" d="M210 28a82 82 0 0 1 71 41"/><path class="motor-coil" d="M281 151a82 82 0 0 1-71 41"/><path class="motor-coil" d="M139 151a82 82 0 0 1 0-82"/><path class="module-line" d="M210 73v74M173 110h74"/></svg></div>
@@ -1902,6 +1949,54 @@
 
       route();
     }
+    // ---------- Screen galleries (robotics feature) ----------
+    document.querySelectorAll('[data-gallery]').forEach(gallery => {
+      const slides = [...gallery.querySelectorAll('.gallery-slide')];
+      const tabs = [...gallery.querySelectorAll('.gallery-tab')];
+      const bar = gallery.querySelector('.gallery-progress i');
+      if (slides.length < 2) return;
+      const DURATION = 5200;
+      let index = 0, timer = 0, started = 0, visible = false, hovering = false, frame = 0;
+      function show(next, fromUser) {
+        index = (next + slides.length) % slides.length;
+        slides.forEach((slide, i) => {
+          const on = i === index;
+          slide.classList.toggle('is-on', on);
+          slide.setAttribute('aria-hidden', String(!on));
+          const video = slide.querySelector('video');
+          if (video) { if (on && visible && !reducedMotion) { video.currentTime = 0; video.play().catch(() => {}); } else video.pause(); }
+        });
+        tabs.forEach((tab, i) => { tab.setAttribute('aria-selected', String(i === index)); tab.tabIndex = i === index ? 0 : -1; });
+        if (fromUser) tabs[index].scrollIntoView({ block: 'nearest', inline: 'nearest' });
+        started = performance.now();
+      }
+      function tick(now) {
+        cancelAnimationFrame(frame);
+        if (!visible || reducedMotion) { bar.style.transform = 'scaleX(0)'; return; }
+        if (hovering) started = now - (parseFloat(bar.dataset.progress || 0) * DURATION);
+        const progress = Math.min(1, (now - started) / DURATION);
+        bar.dataset.progress = progress;
+        bar.style.transform = `scaleX(${progress})`;
+        if (progress >= 1) show(index + 1);
+        frame = requestAnimationFrame(tick);
+      }
+      tabs.forEach((tab, i) => {
+        tab.addEventListener('click', () => { show(i, true); tick(performance.now()); });
+        tab.addEventListener('keydown', event => {
+          if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return;
+          event.preventDefault();
+          show(index + (event.key === 'ArrowRight' ? 1 : -1), true);
+          tabs[index].focus();
+        });
+      });
+      gallery.addEventListener('pointerenter', () => { hovering = true; });
+      gallery.addEventListener('pointerleave', () => { hovering = false; });
+      new IntersectionObserver(([entry]) => {
+        visible = entry.isIntersecting;
+        if (visible) { started = performance.now() - parseFloat(bar.dataset.progress || 0) * DURATION; show(index); tick(performance.now()); }
+        else { cancelAnimationFrame(frame); slides.forEach(slide => slide.querySelector('video')?.pause()); }
+      }, { threshold: .35 }).observe(gallery.querySelector('.gallery-stage'));
+    });
     document.getElementById('year').textContent = new Date().getFullYear();
   </script>
 </body>
