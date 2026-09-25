@@ -887,11 +887,13 @@
     .gallery-stage { background: #08090a; }
     .gallery-slide { position: absolute; inset: 0; margin: 0; opacity: 0; transition: opacity .8s var(--ease); }
     .gallery-slide.is-on { opacity: 1; }
-    .gallery-slide img, .gallery-slide video { width: 100%; height: 100%; object-fit: cover; }
+    .gallery-slide img, .gallery-slide video { width: 100%; height: 100%; object-fit: cover; filter: none; }
+    .gallery-stage::after { content: none; }
     .gallery-progress { position: absolute; z-index: 2; inset: 0 0 auto; height: 2px; background: rgba(255, 255, 255, .08); }
     .gallery-progress i { display: block; width: 100%; height: 100%; background: var(--signal); transform: scaleX(0); transform-origin: left; }
-    .gallery-bar { display: flex; gap: 8px; overflow-x: auto; padding: 16px clamp(20px, 3vw, 34px); border-top: 1px solid var(--line); scrollbar-width: none; }
-    .gallery-bar::-webkit-scrollbar { display: none; }
+    .gallery-bar { display: flex; align-items: center; gap: 16px; padding: 16px clamp(20px, 3vw, 34px); border-top: 1px solid var(--line); }
+    .gallery-tabs { display: flex; gap: 8px; min-width: 0; overflow-x: auto; scrollbar-width: none; }
+    .gallery-tabs::-webkit-scrollbar { display: none; }
     .gallery-tab {
       flex: none; min-height: 40px; padding: 0 15px; display: inline-flex; align-items: center; gap: 9px;
       border: 1px solid var(--line); border-radius: 999px; background: transparent; color: #c7c7c1;
@@ -899,6 +901,8 @@
       transition: background .25s, color .25s, border-color .25s;
     }
     .gallery-tab span { color: var(--signal); font-variant-numeric: tabular-nums; }
+    .gallery-note { flex: none; margin: 0 0 0 auto; color: var(--muted); font-size: 11px; white-space: nowrap; }
+    @media (max-width: 1100px) { .gallery-bar { flex-wrap: wrap; gap: 10px; } .gallery-tabs { width: 100%; } .gallery-note { margin: 0; white-space: normal; } }
     .gallery-tab:hover { border-color: rgba(242, 241, 235, .42); color: var(--white); }
     .gallery-tab[aria-selected="true"] { background: var(--paper); border-color: var(--paper); color: var(--ink); }
     .gallery-tab[aria-selected="true"] span { color: var(--signal-dark); }
@@ -906,13 +910,6 @@
     .feature-status i { flex: none; width: 8px; height: 8px; margin-top: 6px; border-radius: 50%; background: var(--signal); box-shadow: 0 0 12px var(--signal); }
     .feature-status strong { color: var(--paper); font-weight: 600; }
     .project-grid.two { grid-template-columns: repeat(2, 1fr); }
-    .gallery-fallback { display: grid; place-items: center; padding: 6% 14%; background: radial-gradient(circle at 60% 40%, rgba(255, 107, 44, .14), transparent 62%), #0c0d10; }
-    .gallery-fallback svg { width: 100%; height: 100%; }
-    .gallery-fallback .weld-line, .gallery-fallback .module-line { fill: none; stroke: rgba(242, 241, 235, .7); }
-    .gallery-fallback .weld-joint { fill: var(--ink-soft); stroke: var(--paper); }
-    .gallery-fallback .weld-live, .gallery-fallback .module-node.live { stroke: var(--signal); fill: none; }
-    .gallery-fallback .module-node.live { fill: var(--signal); }
-    .gallery-bar:not(:has(.gallery-tab)) { display: none; }
     .weld-detail { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(440px, .95fr); align-items: start; gap: clamp(48px, 8vw, 128px); padding: clamp(40px, 5vw, 70px) clamp(44px, 6vw, 82px); border-top: 1px solid var(--line); }
     .detail-label { margin: 0 0 20px; color: var(--muted); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; }
     .field-log { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
@@ -1057,12 +1054,22 @@
 
         <article class="feature feature-weld reveal" data-gallery>
           <div class="feature-media gallery-stage">
-<!--WELD-SLIDES-->
-            <figure class="gallery-slide gallery-fallback is-on" aria-hidden="true"><svg viewBox="0 0 420 220" preserveAspectRatio="xMidYMid meet"><path class="weld-line" d="M34 165c72-52 120 15 182-34s104-76 170-63"/><path class="weld-live" d="M96 139c48-10 74 19 120-8s67-54 110-61"/><path class="module-line" d="M70 181 171 102l98 7" stroke-width="18" stroke-linecap="round"/><circle class="weld-joint" cx="70" cy="181" r="15"/><circle class="weld-joint" cx="171" cy="102" r="13"/><circle class="weld-joint" cx="269" cy="109" r="11"/><circle class="module-node live" cx="326" cy="70" r="7"/></svg></figure>
+            <figure class="gallery-slide is-on" id="weld-slide-1" role="tabpanel" aria-labelledby="weld-tab-1"><img src="assets/robotics/weld-seam/shot-2.webp" alt="Planned toolpath on a demo weldment: four sequenced seams, 22 waypoints with their tool frames, and the CR10A arm model inside its reach envelope" width="1600" height="900" loading="lazy" decoding="async"></figure>
+            <figure class="gallery-slide" id="weld-slide-2" role="tabpanel" aria-labelledby="weld-tab-2"><img src="assets/robotics/weld-seam/shot-1.webp" alt="Seams found on two generated two-body parts, each colour-coded and labelled with its length" width="1600" height="900" loading="lazy" decoding="async"></figure>
+            <figure class="gallery-slide" id="weld-slide-3" role="tabpanel" aria-labelledby="weld-tab-3"><img src="assets/robotics/weld-seam/shot-3.webp" alt="Simulated depth scan and ICP alignment recovering a part displaced by 5 mm and 10 degrees, with the nominal and corrected paths" width="1600" height="900" loading="lazy" decoding="async"></figure>
+            <figure class="gallery-slide" id="weld-slide-4" role="tabpanel" aria-labelledby="weld-tab-4" data-duration="11600"><video muted playsinline preload="none" poster="assets/robotics/weld-seam/demo-poster.webp" aria-label="The operator screen running a path in simulation: seam segments turn green as each waypoint is confirmed"><source src="assets/robotics/weld-seam/demo.mp4" type="video/mp4"></video></figure>
+            <figure class="gallery-slide" id="weld-slide-5" role="tabpanel" aria-labelledby="weld-tab-5"><img src="assets/robotics/weld-seam/cover.webp" alt="The operator screen after a simulated run, with the arm back at its derived home posture and the run log" width="1600" height="900" loading="lazy" decoding="async"></figure>
             <div class="gallery-progress" aria-hidden="true"><i></i></div>
           </div>
-          <div class="gallery-bar" role="tablist" aria-label="Weld path system screens">
-<!--WELD-TABS-->
+          <div class="gallery-bar">
+            <div class="gallery-tabs" role="tablist" aria-label="Weld path system screens">
+              <button class="gallery-tab" id="weld-tab-1" type="button" role="tab" aria-selected="true" aria-controls="weld-slide-1" tabindex="0"><span>01</span>Toolpath</button>
+              <button class="gallery-tab" id="weld-tab-2" type="button" role="tab" aria-selected="false" aria-controls="weld-slide-2" tabindex="-1"><span>02</span>Seam detection</button>
+              <button class="gallery-tab" id="weld-tab-3" type="button" role="tab" aria-selected="false" aria-controls="weld-slide-3" tabindex="-1"><span>03</span>Scan + ICP</button>
+              <button class="gallery-tab" id="weld-tab-4" type="button" role="tab" aria-selected="false" aria-controls="weld-slide-4" tabindex="-1"><span>04</span>Operator run</button>
+              <button class="gallery-tab" id="weld-tab-5" type="button" role="tab" aria-selected="false" aria-controls="weld-slide-5" tabindex="-1"><span>05</span>Run log</button>
+            </div>
+            <p class="gallery-note">Rendered from the project&rsquo;s own code · simulated backend</p>
           </div>
           <div class="feature-copy">
             <div>
@@ -1071,7 +1078,7 @@
               <p>Give it a STEP file and it finds the <strong>weld seams</strong>, plans an oriented, sequenced toolpath and drives a <strong>Dobot CR10A</strong> over the controller&rsquo;s own TCP/IP protocol. Every step is rule-based and explainable, and eight pre-flight checks can refuse a run <strong>before the first motion command</strong>. Lining the path up with the part from a depth scan (ICP) works in simulation; the wrist camera is being integrated.</p>
               <p class="feature-status"><i aria-hidden="true"></i><span><strong>TÜBİTAK 1707:</strong> the system is now at the application stage as the core of an order-based industrial R&amp;D project.</span></p>
             </div>
-            <div class="metric-grid" aria-label="Project facts"><div class="metric"><b>42 / 42</b><span>waypoints flown on a real CR10A</span></div><div class="metric"><b>8 gates</b><span>refuse before any motion</span></div><div class="metric"><b>5,400+</b><span>automated tests</span></div><div class="metric"><b>0 ML</b><span>rule-based, explainable</span></div></div>
+            <div class="metric-grid" aria-label="Project facts"><div class="metric"><b>42 / 42</b><span>waypoints flown on a real CR10A</span></div><div class="metric"><b>8 gates</b><span>refuse before any motion</span></div><div class="metric"><b>6,100+</b><span>automated tests</span></div><div class="metric"><b>0 ML</b><span>rule-based, explainable</span></div></div>
           </div>
           <div class="weld-detail">
             <div>
@@ -1080,6 +1087,7 @@
                 <li><time datetime="2026-07-29">29 Jul 2026</time><div><b>First contact.</b><p>Connected, enabled and ran the full path on the real arm. One stop, from the controller&rsquo;s own singularity alarm.</p></div></li>
                 <li><time datetime="2026-08-07">07 Aug 2026</time><div><b>27 of 42.</b><p>The wrist ran out of travel at waypoint 27. That failure became the wrist-budget check.</p></div></li>
                 <li><time datetime="2026-08-21">21 Aug 2026</time><div><b>42 of 42 in 98.9&nbsp;s.</b><p>The first full path flown under every check: 8 seams, with a pen standing in for the torch.</p></div></li>
+                <li><time datetime="2026-09-10">10 Sep 2026</time><div><b>Camera online.</b><p>First calibration of the real wrist camera. Hand-eye calibration follows once its bracket is printed.</p></div></li>
               </ol>
               <p class="detail-note">All site runs were motion-only: no torch mounted, no arc struck.</p>
             </div>
@@ -2009,7 +2017,7 @@
       const tabs = [...gallery.querySelectorAll('.gallery-tab')];
       const bar = gallery.querySelector('.gallery-progress i');
       if (slides.length < 2) return;
-      const DURATION = 5200;
+      const duration = () => parseFloat(slides[index].dataset.duration) || 5200;
       let index = 0, timer = 0, started = 0, visible = false, hovering = false, frame = 0;
       function show(next, fromUser) {
         index = (next + slides.length) % slides.length;
@@ -2027,8 +2035,8 @@
       function tick(now) {
         cancelAnimationFrame(frame);
         if (!visible || reducedMotion) { bar.style.transform = 'scaleX(0)'; return; }
-        if (hovering) started = now - (parseFloat(bar.dataset.progress || 0) * DURATION);
-        const progress = Math.min(1, (now - started) / DURATION);
+        if (hovering) started = now - (parseFloat(bar.dataset.progress || 0) * duration());
+        const progress = Math.min(1, (now - started) / duration());
         bar.dataset.progress = progress;
         bar.style.transform = `scaleX(${progress})`;
         if (progress >= 1) show(index + 1);
@@ -2047,7 +2055,7 @@
       gallery.addEventListener('pointerleave', () => { hovering = false; });
       new IntersectionObserver(([entry]) => {
         visible = entry.isIntersecting;
-        if (visible) { started = performance.now() - parseFloat(bar.dataset.progress || 0) * DURATION; show(index); tick(performance.now()); }
+        if (visible) { started = performance.now() - parseFloat(bar.dataset.progress || 0) * duration(); show(index); tick(performance.now()); }
         else { cancelAnimationFrame(frame); slides.forEach(slide => slide.querySelector('video')?.pause()); }
       }, { threshold: .35 }).observe(gallery.querySelector('.gallery-stage'));
     });
