@@ -913,6 +913,27 @@
     .gallery-fallback .weld-live, .gallery-fallback .module-node.live { stroke: var(--signal); fill: none; }
     .gallery-fallback .module-node.live { fill: var(--signal); }
     .gallery-bar:not(:has(.gallery-tab)) { display: none; }
+    .weld-detail { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(440px, .95fr); align-items: start; gap: clamp(48px, 8vw, 128px); padding: clamp(40px, 5vw, 70px) clamp(44px, 6vw, 82px); border-top: 1px solid var(--line); }
+    .detail-label { margin: 0 0 20px; color: var(--muted); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; }
+    .field-log { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
+    .field-log li { display: grid; grid-template-columns: 104px 1fr; gap: 22px; padding: 20px 0; border-bottom: 1px solid var(--line); }
+    .field-log time { padding-top: 5px; color: var(--signal); font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; }
+    .field-log b { display: block; margin-bottom: 6px; font-family: var(--display); font-size: 22px; font-weight: 560; letter-spacing: -.02em; }
+    .field-log p { max-width: 52ch; margin: 0; color: #abb1b8; font-size: 14px; line-height: 1.55; }
+    .detail-note { margin: 18px 0 0; color: var(--muted); font-size: 12px; line-height: 1.7; }
+    .detail-note strong { margin-right: 8px; color: #d8dbde; font-size: 10px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; }
+    .gate-list { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; margin: 0; padding: 0; list-style: none; background: var(--line); border: 1px solid var(--line); counter-reset: gate; }
+    .gate-list li { padding: 15px 16px 16px; background: var(--ink); counter-increment: gate; }
+    .gate-list li::before { content: counter(gate, decimal-leading-zero); display: block; margin-bottom: 8px; color: var(--signal); font-size: 10px; font-weight: 600; letter-spacing: .1em; font-variant-numeric: tabular-nums; }
+    .gate-list b { display: block; margin-bottom: 3px; font-size: 14px; font-weight: 600; }
+    .gate-list span { display: block; color: var(--muted); font-size: 12px; line-height: 1.45; }
+    @media (max-width: 1100px) { .weld-detail { grid-template-columns: 1fr; gap: 48px; } }
+    @media (max-width: 540px) {
+      .weld-detail { padding: 34px 22px 38px; gap: 40px; }
+      .field-log li { grid-template-columns: 1fr; gap: 6px; padding: 16px 0; }
+      .field-log time { padding-top: 0; }
+      .gate-list li { padding: 13px 12px 14px; }
+    }
     @media (max-width: 1100px) {
       .project-grid.two .project-card:last-child { grid-column: auto; min-height: 590px; }
     }
@@ -1047,10 +1068,35 @@
             <div>
               <div class="feature-top"><span>02 — Industrial system</span><span>Real CR10A</span></div>
               <h3>CAD-to-robot weld path.</h3>
-              <p>Give it a STEP file and it finds the <strong>weld seams</strong>, plans an oriented, sequenced toolpath, aligns it to the real part with a camera and drives a <strong>Dobot CR10A</strong> over the controller&rsquo;s own TCP/IP protocol. Every step is rule-based and explainable, and eight pre-flight checks can refuse a run <strong>before the first motion command</strong>.</p>
+              <p>Give it a STEP file and it finds the <strong>weld seams</strong>, plans an oriented, sequenced toolpath and drives a <strong>Dobot CR10A</strong> over the controller&rsquo;s own TCP/IP protocol. Every step is rule-based and explainable, and eight pre-flight checks can refuse a run <strong>before the first motion command</strong>. Lining the path up with the part from a depth scan (ICP) works in simulation; the wrist camera is being integrated.</p>
               <p class="feature-status"><i aria-hidden="true"></i><span><strong>TÜBİTAK 1707:</strong> the system is now at the application stage as the core of an order-based industrial R&amp;D project.</span></p>
             </div>
             <div class="metric-grid" aria-label="Project facts"><div class="metric"><b>42 / 42</b><span>waypoints flown on a real CR10A</span></div><div class="metric"><b>8 gates</b><span>refuse before any motion</span></div><div class="metric"><b>5,400+</b><span>automated tests</span></div><div class="metric"><b>0 ML</b><span>rule-based, explainable</span></div></div>
+          </div>
+          <div class="weld-detail">
+            <div>
+              <p class="detail-label">Field log</p>
+              <ol class="field-log">
+                <li><time datetime="2026-07-29">29 Jul 2026</time><div><b>First contact.</b><p>Connected, enabled and ran the full path on the real arm. One stop, from the controller&rsquo;s own singularity alarm.</p></div></li>
+                <li><time datetime="2026-08-07">07 Aug 2026</time><div><b>27 of 42.</b><p>The wrist ran out of travel at waypoint 27. That failure became the wrist-budget check.</p></div></li>
+                <li><time datetime="2026-08-21">21 Aug 2026</time><div><b>42 of 42 in 98.9&nbsp;s.</b><p>The first full path flown under every check: 8 seams, with a pen standing in for the torch.</p></div></li>
+              </ol>
+              <p class="detail-note">All site runs were motion-only: no torch mounted, no arc struck.</p>
+            </div>
+            <div>
+              <p class="detail-label">Pre-flight checks</p>
+              <ol class="gate-list">
+                <li><b>Reach</b><span>Every target inside the planned envelope</span></li>
+                <li><b>Singularity</b><span>Solved by the controller&rsquo;s own IK, clear of singular poses</span></li>
+                <li><b>Wrist budget</b><span>The seam order fits the wrist&rsquo;s travel</span></li>
+                <li><b>Arm clearance</b><span>No link meets the floor or the part</span></li>
+                <li><b>Home-posture turn</b><span>Home is not a full wrist turn away</span></li>
+                <li><b>Pendant tool</b><span>No stray tool frame left on the pendant</span></li>
+                <li><b>Home sweep</b><span>The tool stays clear of the floor while homing</span></li>
+                <li><b>Self-collision</b><span>The arm&rsquo;s links never meet each other</span></li>
+              </ol>
+              <p class="detail-note"><strong>Hardware</strong> Dobot CR10A · wrist-mounted industrial camera<br><strong>Stack</strong> Python · CadQuery / OpenCASCADE · Open3D · PyVista · PyQt5</p>
+            </div>
           </div>
         </article>
 
@@ -1086,7 +1132,7 @@
       <div class="experience-grid shell">
         <header><p class="eyebrow reveal"><span class="section-index">04</span> Experience</p><h2 class="reveal" id="experience-title">From shop floor to software.</h2></header>
         <div class="timeline">
-          <article class="role reveal"><time>Jul 2026 — now</time><div><h3>Robotics Software Engineer</h3><p class="org">Contract · Remote</p><p>CAD-to-robot weld path generation for a real collaborative arm, plus a retrieval-grounded engineering feasibility platform.</p></div></article>
+          <article class="role reveal"><time>Jul 2026 — now</time><div><h3>Robotics Software Engineer</h3><p class="org">Contract · Remote &amp; on-site</p><p>CAD-to-robot weld path generation for a real collaborative arm: flown end to end on a Dobot CR10A across three site visits, and now at the TÜBİTAK 1707 application stage. Also a retrieval-grounded engineering feasibility platform.</p></div></article>
           <article class="role reveal"><time>Aug 2025 — Apr 2026</time><div><h3>Mechanical & Automation Engineer</h3><p class="org">BYRSAN Makina · Istanbul</p><p>PLC/HMI control, DIN-compliant structural engineering, and the company's digital infrastructure from site to quote-management system.</p></div></article>
           <article class="role reveal"><time>Feb 2025 — May 2025</time><div><h3>Engineering Intern — Robotics & .NET</h3><p class="org">Tezmaksan Makina · Istanbul</p><p>FANUC robot programming and cell validation on the production floor, alongside industrial IoT dashboards with .NET Core.</p></div></article>
           <article class="role reveal"><time>2021 — now</time><div><h3>M.Sc. & B.Sc. Mechatronics Engineering</h3><p class="org">Yıldız Technical University · Pamukkale University</p><p>M.Sc. thesis on autonomous modular robotics. Academic work spans controls, HIL test design and rigorous V-model verification.</p></div></article>
