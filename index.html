@@ -977,6 +977,131 @@
       .field-log time { padding-top: 0; }
       .gate-list li { padding: 13px 12px 14px; }
     }
+    /* ---------- Robotics: weld lab (pen test, error budget, measurement loops) ---------- */
+    .weld-lab {
+      display: grid; gap: clamp(64px, 8vw, 112px); padding: clamp(48px, 6vw, 84px) clamp(44px, 6vw, 82px);
+      border-top: 1px solid var(--line); background: linear-gradient(180deg, rgba(158, 231, 245, .025), transparent 40%);
+    }
+    .weld-lab h4 {
+      margin: 0 0 20px; font-family: var(--display); font-size: clamp(32px, 3.6vw, 52px); font-weight: 680;
+      font-variation-settings: "wdth" 88, "wght" 680; line-height: .94; letter-spacing: -.05em; text-wrap: balance;
+    }
+    .weld-lab p { max-width: 56ch; color: #abb1b8; font-size: 15px; line-height: 1.65; }
+    .weld-lab p strong, .weld-lab p em { color: var(--paper); font-style: normal; font-weight: 500; }
+    .weld-lab .detail-label { color: var(--signal); font-weight: 600; }
+    .weld-lab .detail-note { font-size: 12px; }
+
+    .pen-test { display: grid; grid-template-columns: minmax(240px, 340px) minmax(0, 1fr); align-items: center; gap: clamp(36px, 6vw, 88px); margin: 0; }
+    .pen-clip { position: relative; aspect-ratio: 478 / 640; overflow: hidden; border: 1px solid var(--line); background: #08090a; }
+    .pen-clip video { width: 100%; height: 100%; object-fit: cover; }
+    .pen-clip::after { content: ""; position: absolute; inset: 0; pointer-events: none; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .04); background: linear-gradient(180deg, rgba(10, 11, 13, .45), transparent 22%); }
+    .pen-badge {
+      position: absolute; z-index: 1; left: 12px; top: 12px; display: inline-flex; align-items: center; gap: 8px; padding: 6px 11px;
+      border: 1px solid rgba(242, 241, 235, .22); border-radius: 999px; background: rgba(10, 11, 13, .72);
+      color: var(--paper); font-size: 10px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+    }
+    .pen-badge i { width: 7px; height: 7px; border-radius: 50%; background: var(--signal); animation: rec 1.6s ease-in-out infinite; }
+    @keyframes rec { 50% { opacity: .25; } }
+    .pen-test figcaption p { margin: 0 0 14px; }
+
+    .budget { display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); align-items: center; gap: clamp(36px, 6vw, 88px); }
+    .budget-copy > p:not(.detail-label):not(.detail-note) { margin: 0; }
+    .budget-controls { display: grid; gap: 14px; margin: 30px 0 22px; }
+    .budget-slider { display: grid; gap: 4px; }
+    .budget-slider span { display: flex; justify-content: space-between; color: #c7c7c1; font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; }
+    .budget-slider output { color: var(--signal); font-variant-numeric: tabular-nums; }
+    .budget-slider input {
+      --fill: 50%; width: 100%; height: 32px; margin: 0; background: transparent; cursor: pointer; -webkit-appearance: none; appearance: none;
+    }
+    .budget-slider input::-webkit-slider-runnable-track { height: 2px; background: linear-gradient(90deg, var(--signal) var(--fill), rgba(242, 241, 235, .16) var(--fill)); }
+    .budget-slider input::-moz-range-track { height: 2px; background: rgba(242, 241, 235, .16); }
+    .budget-slider input::-moz-range-progress { height: 2px; background: var(--signal); }
+    .budget-slider input::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 20px; height: 20px; margin-top: -9px; border: 2px solid var(--signal); border-radius: 50%;
+      background: var(--ink); box-shadow: 0 0 0 5px rgba(255, 107, 44, .14); transition: transform .2s var(--ease);
+    }
+    .budget-slider input::-moz-range-thumb { width: 16px; height: 16px; border: 2px solid var(--signal); border-radius: 50%; background: var(--ink); box-shadow: 0 0 0 5px rgba(255, 107, 44, .14); }
+    .budget-slider input:active::-webkit-slider-thumb { transform: scale(1.15); }
+
+    .budget-viz { display: grid; gap: 22px; padding: clamp(18px, 2.4vw, 30px); border: 1px solid var(--line); background: #0c0d10; }
+    .seam-view { width: 100%; height: auto; overflow: visible; }
+    .seam-view .plate { fill: #22252b; stroke: rgba(242, 241, 235, .14); }
+    .tip-label { fill: #c7c7c1; font: 500 11px var(--body); }
+    .seam-view .band { fill: rgba(158, 231, 245, .06); stroke: rgba(158, 231, 245, .45); stroke-dasharray: 5 5; transition: fill .3s, stroke .3s; }
+    .seam-view .band.breach { fill: rgba(255, 107, 44, .07); stroke: var(--signal); }
+    .seam-view .seam-axis { stroke: rgba(242, 241, 235, .3); stroke-dasharray: 2 6; }
+    .seam-label { fill: var(--muted); font: 600 10px var(--body); letter-spacing: .1em; }
+    .seam-label.end { text-anchor: end; }
+    .tip { transition: transform .5s var(--ease); }
+    .tip.typical circle { fill: rgba(255, 107, 44, .22); stroke: var(--signal); stroke-width: 2; }
+    .tip.typical .core { fill: var(--signal); stroke: none; }
+    .tip.worst circle { fill: none; stroke: rgba(242, 241, 235, .6); stroke-width: 1.5; stroke-dasharray: 3 3; }
+    .tip-lead { stroke: rgba(242, 241, 235, .35); stroke-dasharray: 2 3; transition: all .5s var(--ease); }
+
+    .budget-bars { --name: 150px; --value: 44px; display: grid; gap: 12px; }
+    .budget-scale { position: relative; height: 16px; margin: 0 calc(var(--value) + 14px) 0 calc(var(--name) + 14px); color: var(--muted); font-size: 10px; letter-spacing: .08em; }
+    .budget-scale span { position: absolute; left: calc(var(--at) * 100%); transform: translateX(-50%); white-space: nowrap; }
+    .budget-scale span:first-child { transform: none; }
+    .budget-scale span:last-child { transform: translateX(-100%); }
+    .budget-scale .limit { color: var(--signal); font-weight: 600; }
+    .budget-row { display: grid; grid-template-columns: var(--name) minmax(0, 1fr) var(--value); align-items: center; gap: 14px; }
+    .budget-name { color: #c7c7c1; font-size: 12px; }
+    .budget-row b { font-family: var(--display); font-size: 17px; font-weight: 560; font-variant-numeric: tabular-nums; text-align: right; }
+    .budget-row b.over { color: var(--signal); }
+    .budget-track { position: relative; display: flex; height: 12px; background: rgba(242, 241, 235, .06); }
+    .budget-track::after { content: ""; position: absolute; left: 41.67%; top: -5px; bottom: -5px; width: 1px; background: var(--signal); }
+    .seg { display: block; height: 100%; width: 0; transition: width .5s var(--ease); }
+    .rep { background: #7d848c; }
+    .cal { background: var(--ice); }
+    .heat { background: var(--signal-soft); }
+    .flex { background: var(--signal); }
+    .rss { background: repeating-linear-gradient(135deg, var(--paper) 0 4px, #c9c8c1 4px 8px); }
+    .budget-legend { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 18px; margin: 4px 0 0; padding: 0; list-style: none; color: var(--muted); font-size: 12px; }
+    .budget-legend li { display: flex; align-items: center; gap: 8px; }
+    .budget-legend i { flex: none; width: 10px; height: 10px; }
+    .budget-legend b { margin-left: auto; color: var(--paper); font-weight: 500; font-variant-numeric: tabular-nums; }
+    .weld-lab .budget-verdict { min-height: 3.3em; margin: 4px 0 0; padding-left: 14px; border-left: 2px solid var(--signal); color: var(--paper); font-family: var(--display); font-size: 18px; line-height: 1.35; letter-spacing: -.01em; }
+
+    .loops { display: grid; gap: 34px; }
+    .loops-head { max-width: 760px; }
+    .loops-head p { margin: 0; }
+    .loop-list { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 1px; margin: 0; padding: 0; list-style: none; background: var(--line); border: 1px solid var(--line); }
+    .loop-list li { position: relative; display: grid; align-content: start; gap: 6px; padding: 30px 18px 22px; background: var(--ink); }
+    /* Tick density shows how often each loop measures: once a shift up to continuously. */
+    .loop-list li::before {
+      content: ""; position: absolute; left: 0; right: 0; top: 0; height: 8px;
+      background: repeating-linear-gradient(90deg, var(--signal) 0 1px, transparent 1px var(--tick, 20px));
+      opacity: .75; -webkit-mask: linear-gradient(90deg, #000 60%, transparent); mask: linear-gradient(90deg, #000 60%, transparent);
+    }
+    .loop-list li:nth-child(1) { --tick: 64px; }
+    .loop-list li:nth-child(2) { --tick: 22px; }
+    .loop-list li:nth-child(3) { --tick: 11px; }
+    .loop-list li:nth-child(4) { --tick: 3px; }
+    .loop-list li:nth-child(5) { --tick: 22px; }
+    .loop-list span { color: var(--signal); font-size: 10px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; }
+    .loop-list b { font-family: var(--display); font-size: 20px; font-weight: 560; letter-spacing: -.02em; }
+    .loop-list em { color: var(--muted); font-size: 13px; font-style: normal; line-height: 1.45; }
+    .weld-lab .loops-rule { max-width: 78ch; margin: 0; padding: 16px 18px; border-left: 2px solid var(--signal); background: rgba(255, 107, 44, .06); font-size: 14px; }
+    .weld-lab .loops-rule strong { display: block; margin-bottom: 4px; color: var(--signal); font-size: 10px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; }
+
+    @media (max-width: 1100px) {
+      .budget { grid-template-columns: 1fr; }
+      .loop-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+    @media (max-width: 800px) {
+      .pen-test { grid-template-columns: 1fr; }
+      .pen-clip { width: min(100%, 340px); }
+      .loop-list { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 540px) {
+      .weld-lab { padding: 40px 22px 44px; gap: 64px; }
+      .budget-bars { --name: 96px; --value: 40px; }
+      .budget-legend { grid-template-columns: 1fr; }
+      .loop-list { grid-template-columns: 1fr; }
+      .loop-list li { padding: 24px 16px 18px; }
+    }
+    @media (prefers-reduced-motion: reduce) { .pen-badge i { animation: none; } }
+
     @media (max-width: 1100px) {
       .project-grid.two .project-card:last-child { grid-column: auto; min-height: 590px; }
     }
@@ -1119,12 +1244,12 @@
           </div>
           <div class="feature-copy">
             <div>
-              <div class="feature-top"><span>02 — Industrial system</span><span>Real CR10A</span></div>
+              <div class="feature-top"><span>02 — Industrial system</span><span>Real CR10A · CR5A</span></div>
               <h3>CAD-to-robot weld path.</h3>
-              <p>Give it a STEP file and it finds the <strong>weld seams</strong>, plans an oriented, sequenced toolpath and drives a <strong>Dobot CR10A</strong> over the controller&rsquo;s own TCP/IP protocol. Every step is rule-based and explainable, and eight pre-flight checks can refuse a run <strong>before the first motion command</strong>. Lining the path up with the part from a depth scan (ICP) works in simulation; the wrist camera is being integrated.</p>
+              <p>Give it a STEP file and it finds the <strong>weld seams</strong>, plans an oriented, sequenced toolpath and drives a <strong>Dobot CR10A</strong> over the controller&rsquo;s own TCP/IP protocol. Seams are ordered by an exact Held&ndash;Karp search that weighs travel against wrist winding, every step is rule-based and explainable, and eight pre-flight checks can refuse a run <strong>before the first motion command</strong>. Lining the path up with the part from a depth scan (ICP) works in simulation; the wrist camera is now on the arm.</p>
               <p class="feature-status"><i aria-hidden="true"></i><span><strong>TÜBİTAK 1707:</strong> the system is now at the application stage as the core of an order-based industrial R&amp;D project.</span></p>
             </div>
-            <div class="metric-grid" aria-label="Project facts"><div class="metric"><b>42 / 42</b><span>waypoints flown on a real CR10A</span></div><div class="metric"><b>8 gates</b><span>refuse before any motion</span></div><div class="metric"><b>6,100+</b><span>automated tests</span></div><div class="metric"><b>0 ML</b><span>rule-based, explainable</span></div></div>
+            <div class="metric-grid" aria-label="Project facts"><div class="metric"><b>42 / 42</b><span>waypoints flown on a real CR10A</span></div><div class="metric"><b>8 gates</b><span>refuse before any motion</span></div><div class="metric"><b>6,900+</b><span>automated tests</span></div><div class="metric"><b>0 ML</b><span>rule-based, explainable</span></div></div>
           </div>
           <div class="weld-detail">
             <div>
@@ -1133,7 +1258,8 @@
                 <li><time datetime="2026-07-29">29 Jul 2026</time><div><b>First contact.</b><p>Connected, enabled and ran the full path on the real arm. One stop, from the controller&rsquo;s own singularity alarm.</p></div></li>
                 <li><time datetime="2026-08-07">07 Aug 2026</time><div><b>27 of 42.</b><p>The wrist ran out of travel at waypoint 27. That failure became the wrist-budget check.</p></div></li>
                 <li><time datetime="2026-08-21">21 Aug 2026</time><div><b>42 of 42 in 98.9&nbsp;s.</b><p>The first full path flown under every check: 8 seams, with a pen standing in for the torch.</p></div></li>
-                <li><time datetime="2026-09-10">10 Sep 2026</time><div><b>Camera online.</b><p>First calibration of the real wrist camera. Hand-eye calibration follows once its bracket is printed.</p></div></li>
+                <li><time datetime="2026-09-10">10 Sep 2026</time><div><b>Camera calibrated.</b><p>Lens calibration of the industrial camera: 0.135&nbsp;px RMS over 44 views.</p></div></li>
+                <li><time datetime="2026-10">Oct 2026</time><div><b>Second arm, first words.</b><p>The planner moved to a CR5A and wrote on paper. The camera went onto the wrist and found the sheet untaught.</p></div></li>
               </ol>
               <p class="detail-note">All site runs were motion-only: no torch mounted, no arc struck.</p>
             </div>
@@ -1149,7 +1275,75 @@
                 <li><b>Home sweep</b><span>The tool stays clear of the floor while homing</span></li>
                 <li><b>Self-collision</b><span>The arm&rsquo;s links never meet each other</span></li>
               </ol>
-              <p class="detail-note"><strong>Hardware</strong> Dobot CR10A · wrist-mounted industrial camera<br><strong>Stack</strong> Python · CadQuery / OpenCASCADE · Open3D · PyVista · PyQt5</p>
+              <p class="detail-note"><strong>Hardware</strong> Dobot CR10A · Dobot CR5A · wrist-mounted industrial camera<br><strong>Stack</strong> Python · CadQuery / OpenCASCADE · Open3D · PyVista · PyQt5</p>
+            </div>
+          </div>
+
+          <div class="weld-lab">
+            <figure class="pen-test">
+              <div class="pen-clip">
+                <video muted loop playsinline preload="none" poster="assets/robotics/pen-test/poster.webp" data-autoplay aria-label="Time-lapse: a collaborative arm holding a red marker writes a word on an A4 sheet, letter by letter"><source src="assets/robotics/pen-test/timelapse.mp4" type="video/mp4"></video>
+                <span class="pen-badge" aria-hidden="true"><i></i>4&times; time-lapse</span>
+              </div>
+              <figcaption>
+                <p class="detail-label">Pen test · Oct 2026 · Dobot CR5A</p>
+                <h4>Same planner, second robot, first words.</h4>
+                <p>About 90% of the planner carried over to a smaller arm unchanged. We hand-guided it to the four corners of an A4 sheet and nothing else; <strong>every stroke of the lettering came from the planner</strong>, a pen standing in for the torch.</p>
+                <p>Meanwhile the camera went onto the wrist. In raw frames it already finds the sheet <strong>without its corners being taught</strong>. Next the two meet: the camera finds the sheet, the arm writes. On a shop floor that sentence reads: put the part down, and the robot finds it.</p>
+              </figcaption>
+            </figure>
+
+            <section class="budget" aria-labelledby="budget-title">
+              <div class="budget-copy">
+                <p class="detail-label">Why this is R&amp;D</p>
+                <h4 id="budget-title">Half a millimetre, and who spends it.</h4>
+                <p>Drift more than about 0.5&nbsp;mm off the seam and the arc starts missing one edge of the joint. A cobot returns to the same spot within &plusmn;0.03&nbsp;mm, but <em>going where it is told</em> is a different number, and heat and the hose&rsquo;s pull spend the rest. Warm the arm up and load the torch:</p>
+                <div class="budget-controls">
+                  <label class="budget-slider"><span>Arm warm-up <output id="budgetHeatOut" for="budgetHeat">+10 &deg;C</output></span><input type="range" id="budgetHeat" min="0" max="20" step="1" value="10"></label>
+                  <label class="budget-slider"><span>Torch &amp; hose pull <output id="budgetLoadOut" for="budgetLoad">10 N</output></span><input type="range" id="budgetLoad" min="0" max="30" step="1" value="10"></label>
+                </div>
+                <p class="detail-note">Estimates from catalogue figures and published measurements on comparable arms: a 1&nbsp;m aluminium arm grows about 0.023&nbsp;mm per &deg;C, and a similar cobot gives 57&ndash;96&nbsp;N/mm at the tip. Measuring them on our own arm comes first.</p>
+              </div>
+              <div class="budget-viz">
+                <svg class="seam-view" viewBox="0 0 520 210" role="img" aria-labelledby="seamViewTitle">
+                  <title id="seamViewTitle">Top view of a seam, magnified 70 times, with the 0.5 mm band and where the torch tip lands</title>
+                  <rect class="plate" x="0" y="18" width="520" height="80" rx="2"/><rect class="plate" x="0" y="112" width="520" height="80" rx="2"/>
+                  <rect class="band" id="seamBand" x="0" y="70" width="520" height="70"/>
+                  <line class="seam-axis" x1="0" y1="105" x2="520" y2="105"/>
+                  <text class="seam-label" x="12" y="64">+0.5 mm</text><text class="seam-label" x="12" y="154">&minus;0.5 mm</text>
+                  <g class="tip worst" id="tipWorst"><line class="tip-lead" x1="0" y1="0" x2="0" y2="0"/><circle r="9"/><text class="tip-label" x="16" y="4">all line up</text></g>
+                  <g class="tip typical" id="tipTypical"><circle r="9"/><circle class="core" r="3"/><text class="tip-label" x="16" y="4">partly cancel</text></g>
+                  <text class="seam-label end" x="508" y="204">&times;70</text>
+                </svg>
+                <div class="budget-bars">
+                  <div class="budget-scale" aria-hidden="true"><span style="--at: 0">0</span><span class="limit" style="--at: .4167">0.5 mm</span><span style="--at: 1">1.2</span></div>
+                  <div class="budget-row"><span class="budget-name">If they all line up</span><div class="budget-track"><i class="seg rep"></i><i class="seg cal"></i><i class="seg heat"></i><i class="seg flex"></i></div><b id="budgetSum">0.69</b></div>
+                  <div class="budget-row"><span class="budget-name">If they partly cancel</span><div class="budget-track"><i class="seg rss"></i></div><b id="budgetRss">0.40</b></div>
+                  <ul class="budget-legend">
+                    <li><i class="rep"></i>Repeatability <b id="budgetRep">0.03</b></li>
+                    <li><i class="cal"></i>Calibration residual <b id="budgetCal">0.30</b></li>
+                    <li><i class="heat"></i>Thermal growth <b id="budgetHeatMm">0.23</b></li>
+                    <li><i class="flex"></i>Flex under load <b id="budgetFlex">0.13</b></li>
+                  </ul>
+                  <p class="budget-verdict" id="budgetVerdict" aria-live="polite"></p>
+                </div>
+              </div>
+            </section>
+
+            <div class="loops">
+              <div class="loops-head">
+                <p class="detail-label">The plan</p>
+                <h4>Stop trusting the arm. Measure where the work happens.</h4>
+                <p>Heat drifts over hours, flex changes from one second to the next, so no single sensor catches both. Five loops, five speeds:</p>
+              </div>
+              <ol class="loop-list">
+                <li><span>L0 · shift start</span><b>Touch a reference</b><em>Warm-up and slow drift</em></li>
+                <li><span>L1 · every part</span><b>3D scan</b><em>Where the part really sits</em></li>
+                <li><span>L2 · every seam</span><b>Touch the start</b><em>Slow errors zeroed per seam</em></li>
+                <li><span>L3 · during the weld</span><b>Laser tracking</b><em>Flex that changes along the seam</em></li>
+                <li><span>L4 · after the weld</span><b>Measure the bead</b><em>Tunes the next part</em></li>
+              </ol>
+              <p class="loops-rule"><strong>Learned the hard way</strong> On 21 Aug a tool frame left on the teach pendant moved every target by 440.9&nbsp;mm, and any check reading that same setting saw nothing wrong. So each loop leans on a measurement that does not share the error it corrects.</p>
             </div>
           </div>
         </article>
@@ -1186,7 +1380,7 @@
       <div class="experience-grid shell">
         <header><p class="eyebrow reveal"><span class="section-index">04</span> Experience</p><h2 class="reveal" id="experience-title">From shop floor to software.</h2></header>
         <div class="timeline">
-          <article class="role reveal"><time>Jul 2026 — now</time><div><h3>Robotics Software Engineer</h3><p class="org">Contract · Remote &amp; on-site</p><p>CAD-to-robot weld path generation for a real collaborative arm: flown end to end on a Dobot CR10A across three site visits, and now at the TÜBİTAK 1707 application stage. Also a retrieval-grounded engineering feasibility platform.</p></div></article>
+          <article class="role reveal"><time>Jul 2026 — now</time><div><h3>Robotics Software Engineer</h3><p class="org">Contract · Remote &amp; on-site</p><p>CAD-to-robot weld path generation for a real collaborative arm: flown end to end on a Dobot CR10A, ported to a CR5A, and now at the TÜBİTAK 1707 application stage. Also a retrieval-grounded engineering feasibility platform.</p></div></article>
           <article class="role reveal"><time>Aug 2025 — Apr 2026</time><div><h3>Mechanical & Automation Engineer</h3><p class="org">BYRSAN Makina · Istanbul</p><p>PLC/HMI control, DIN-compliant structural engineering, and the company's digital infrastructure from site to quote-management system.</p></div></article>
           <article class="role reveal"><time>Feb 2025 — May 2025</time><div><h3>Engineering Intern — Robotics & .NET</h3><p class="org">Tezmaksan Makina · Istanbul</p><p>FANUC robot programming and cell validation on the production floor, alongside industrial IoT dashboards with .NET Core.</p></div></article>
           <article class="role reveal"><time>2021 — now</time><div><h3>M.Sc. & B.Sc. Mechatronics Engineering</h3><p class="org">Yıldız Technical University · Pamukkale University</p><p>M.Sc. thesis on autonomous modular robotics. Academic work spans controls, HIL test design and rigorous V-model verification.</p></div></article>
@@ -1788,7 +1982,7 @@
 
     const revealObserver = new IntersectionObserver(entries => entries.forEach(entry => {
       if (entry.isIntersecting) { entry.target.classList.add('in'); revealObserver.unobserve(entry.target); }
-    }), { threshold: .12, rootMargin: '0px 0px -5% 0px' });
+    }), { threshold: 0, rootMargin: '0px 0px -12% 0px' }); // a ratio threshold never fires on blocks taller than ~8 screens
     document.querySelectorAll('.reveal').forEach(element => revealObserver.observe(element));
 
     const sectionObserver = new IntersectionObserver(entries => entries.forEach(entry => {
@@ -2172,6 +2366,45 @@
         else { cancelAnimationFrame(frame); slides.forEach(slide => slide.querySelector('video')?.pause()); }
       }, { threshold: .35 }).observe(gallery.querySelector('.gallery-stage'));
     });
+    // ---------- Weld error budget ----------
+    {
+      const heat = document.getElementById('budgetHeat');
+      const load = document.getElementById('budgetLoad');
+      const text = (id, value) => { document.getElementById(id).textContent = value; };
+      const segs = ['rep', 'cal', 'heat', 'flex'].map(name => document.querySelector(`.budget-track .${name}`));
+      const rss = document.querySelector('.budget-track .rss');
+      const band = document.getElementById('seamBand');
+      const tipTypical = document.getElementById('tipTypical');
+      const tipWorst = document.getElementById('tipWorst');
+      const lead = tipWorst.querySelector('.tip-lead');
+      const SCALE = 1.2, LIMIT = 0.5, PX_PER_MM = 70, AXIS = 105;
+      const REPEAT = 0.025, CALIBRATION = 0.30, GROWTH_PER_C = 0.023, STIFFNESS = 75;
+      const tipY = mm => clamp(AXIS - mm * PX_PER_MM, 12, 198);
+      function renderBudget() {
+        const parts = [REPEAT, CALIBRATION, heat.value * GROWTH_PER_C, load.value / STIFFNESS];
+        const sum = parts.reduce((a, b) => a + b, 0);
+        const typical = Math.hypot(...parts);
+        parts.forEach((mm, i) => segs[i].style.width = `${Math.min(mm, SCALE) / SCALE * 100}%`);
+        rss.style.width = `${Math.min(typical, SCALE) / SCALE * 100}%`;
+        [heat, load].forEach(input => input.style.setProperty('--fill', `${input.value / input.max * 100}%`));
+        text('budgetHeatOut', `+${heat.value} °C`); text('budgetLoadOut', `${load.value} N`);
+        text('budgetHeatMm', parts[2].toFixed(2)); text('budgetFlex', parts[3].toFixed(2));
+        text('budgetSum', sum.toFixed(2)); text('budgetRss', typical.toFixed(2));
+        document.getElementById('budgetSum').classList.toggle('over', sum > LIMIT);
+        document.getElementById('budgetRss').classList.toggle('over', typical > LIMIT);
+        band.classList.toggle('breach', sum > LIMIT);
+        tipTypical.style.transform = `translate(250px, ${tipY(typical)}px)`;
+        tipWorst.style.transform = `translate(390px, ${tipY(sum)}px)`;
+        lead.setAttribute('y2', String(AXIS - tipY(sum)));
+        text('budgetVerdict', typical > LIMIT
+          ? 'Even when the errors partly cancel, the arm alone misses the seam.'
+          : sum > LIMIT
+            ? 'Inside the band only if the errors happen to cancel. Not something to bet a weld on.'
+            : 'Inside the band, on a cold arm with nothing pulling on it. That is not a factory.');
+      }
+      heat.addEventListener('input', renderBudget); load.addEventListener('input', renderBudget);
+      renderBudget();
+    }
     document.getElementById('year').textContent = new Date().getFullYear();
   </script>
 </body>
