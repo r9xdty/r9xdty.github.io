@@ -51,7 +51,7 @@
     }
 
     *, *::before, *::after { box-sizing: border-box; }
-    html { scroll-behavior: smooth; background: var(--ink); }
+    html { scroll-behavior: smooth; scroll-padding-top: 84px; background: var(--ink); }
     body {
       margin: 0;
       overflow-x: hidden;
@@ -191,7 +191,7 @@
     .hero-art::after {
       content: ""; position: absolute; z-index: -1; inset: 9% -8% 2% -18%;
       background: radial-gradient(circle at 54% 48%, rgba(158,231,245,.12), rgba(255,107,44,.055) 38%, transparent 68%);
-      filter: blur(18px); pointer-events: none;
+      pointer-events: none;
     }
     .orbit { position: absolute; border: 1px solid rgba(242,241,235,.12); border-radius: 50%; }
     .orbit.one { inset: 4% -10% 0 2%; }
@@ -278,22 +278,25 @@
       font-variation-settings: "wdth" 92, "wght" 650; font-weight: 650; line-height: .98; letter-spacing: -.055em;
     }
     .manifesto h2 em { color: var(--signal-dark); font-style: normal; }
+    .manifesto h2.is-split .w { color: rgba(10, 11, 13, .16); transition: color .4s var(--ease); }
+    .manifesto h2.is-split .w.lit { color: inherit; }
     .manifesto-foot { grid-column: 2; max-width: 680px; margin-top: 28px; display: grid; grid-template-columns: 1fr 1fr; gap: 30px; color: var(--muted-dark); }
     .manifesto-foot p { margin: 0; }
 
-    .journey { position: relative; height: 440vh; background: var(--ink); }
-    .journey-sticky { position: sticky; top: 0; height: 100vh; min-height: 680px; overflow: hidden; }
+    .journey { position: relative; height: 380vh; background: var(--ink); }
+    .journey-sticky { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; }
     .journey-grid {
       height: 100%; display: grid; grid-template-columns: minmax(310px, .72fr) minmax(420px, 1.28fr);
       align-items: center; gap: 4vw; padding-top: 90px; padding-bottom: 54px;
     }
-    .journey-copy { position: relative; height: 64vh; min-height: 480px; }
+    .journey-copy { position: relative; height: 64vh; min-height: 420px; }
     .journey-copy > .eyebrow { position: absolute; top: 0; left: 0; }
     .chapter {
       position: absolute; left: 0; top: 50%; width: 100%; transform: translateY(-42%);
-      opacity: 0; pointer-events: none; transition: opacity .22s linear, transform .35s var(--ease);
+      opacity: 0; pointer-events: none; transition: opacity .16s linear, transform .3s var(--ease);
     }
-    .chapter.active { opacity: 1; transform: translateY(-50%); }
+    .chapter.past { transform: translateY(-58%); }
+    .chapter.active { opacity: 1; transform: translateY(-50%); transition: opacity .38s linear .14s, transform .6s var(--ease) .14s; }
     .chapter-number { color: var(--signal); font-size: 12px; font-weight: 600; letter-spacing: .15em; }
     .chapter h3 {
       margin: 16px 0 22px; font-family: var(--display); font-size: clamp(62px, 8vw, 126px);
@@ -467,20 +470,11 @@
       .field-stage.one { left: 7%; }
       .field-stage.three { right: 7%; }
       .scroll-cue { display: none; }
+      /* Backdrop blur over moving video is the costliest thing to repaint on a phone while scrolling. */
+      .site-header.scrolled { background: rgba(10, 11, 13, .94); backdrop-filter: none; -webkit-backdrop-filter: none; }
+      .sound-toggle { background: rgba(10, 11, 13, .9); backdrop-filter: none; -webkit-backdrop-filter: none; }
       .manifesto-grid, .method-head, .experience-grid { grid-template-columns: 1fr; }
       .manifesto-foot { grid-column: 1; }
-
-      .journey { height: auto; padding: 110px 0; }
-      .journey-sticky { position: relative; height: auto; min-height: 0; overflow: visible; }
-      .journey-grid { display: block; padding-top: 0; padding-bottom: 0; }
-      .journey-copy { height: auto; min-height: 0; }
-      .journey-copy > .eyebrow { position: relative; margin-bottom: 60px; }
-      .chapter { position: relative; top: auto; transform: none; opacity: 1; margin: 0 0 72px; pointer-events: auto; }
-      .chapter.active { transform: none; }
-      .chapter h3 { font-size: clamp(58px, 17vw, 92px); }
-      .journey-nav { display: none; }
-      .journey-visual { min-height: 500px; margin-top: 30px; }
-      .journey-readout { right: 0; bottom: 2%; }
 
       .section-head { display: block; }
       .section-head p { margin-top: 28px; }
@@ -496,6 +490,47 @@
       .layer p, .layer-tags { grid-column: 2; padding: 0; }
       .experience h2 { position: relative; top: auto; margin-bottom: 55px; }
       .footer { position: relative; left: auto; right: auto; bottom: auto; margin-top: 90px; }
+    }
+
+    /* Phones, tablets in portrait and short landscape screens: no pinning. The arm
+       sticks under the header while the chapters scroll past it, so the page never stalls. */
+    @media (max-width: 800px), (max-height: 600px) {
+      .journey { height: auto; padding: 96px 0 64px; }
+      .journey-sticky { position: relative; height: auto; overflow: visible; }
+      .journey-grid { display: flex; flex-direction: column; align-items: stretch; padding-top: 0; padding-bottom: 0; }
+      .journey-copy { display: contents; }
+      .journey-copy > .eyebrow { position: relative; order: -2; }
+      .journey-visual {
+        order: -1; position: sticky; top: 68px; z-index: 3; min-height: 0; height: clamp(250px, 46svh, 380px);
+        margin: 18px calc(var(--pad) * -1) 0; border-radius: 0;
+        background: radial-gradient(circle at 50% 52%, rgba(158,231,245,.09), transparent 58%), var(--ink);
+        box-shadow: 0 26px 26px -6px var(--ink);
+      }
+      .journey-visual::before { width: auto; height: 86%; }
+      .journey-visual::after { width: auto; height: 54%; }
+      .journey-svg { width: auto; height: 100%; max-width: 100%; }
+      .journey-readout { right: var(--pad); bottom: 6%; min-width: 0; padding: 10px 12px; backdrop-filter: none; }
+      .journey-readout strong { font-size: 16px; }
+      .chapter {
+        position: relative; top: auto; transform: none; opacity: 1; pointer-events: auto;
+        min-height: 44svh; padding: 9svh 0; display: flex; flex-direction: column; justify-content: center;
+      }
+      .js .chapter { opacity: .22; transition: opacity .45s var(--ease); }
+      .js .chapter.active, .js .chapter.past.active { opacity: 1; transform: none; transition: opacity .45s var(--ease); }
+      .chapter.past { transform: none; }
+      .chapter h3 { margin: 12px 0 16px; font-size: clamp(54px, 16vw, 92px); }
+      .journey-nav { display: none; }
+      .arm-shadow { filter: none; opacity: .12; stroke-width: 52; }
+    }
+    /* Phones and small tablets held sideways: too short to stack, so the arm sits beside the chapters. */
+    @media (max-height: 600px) and (min-width: 560px) {
+      .journey-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); align-items: start; gap: 4vw; }
+      .journey-copy { display: block; height: auto; min-height: 0; padding-bottom: 14svh; }
+      .journey-copy > .eyebrow { margin-bottom: 6svh; }
+      .journey-visual { grid-column: 2; grid-row: 1; top: 76px; height: calc(100svh - 92px); margin: 0; box-shadow: none; }
+      .journey-readout { top: 4%; bottom: auto; }
+      .chapter { min-height: 64svh; }
+      .chapter h3 { font-size: clamp(48px, 9vw, 84px); }
     }
 
     @media (max-width: 540px) {
@@ -524,6 +559,16 @@
       .contact { min-height: 100svh; }
       .contact-meta { align-items: start; flex-direction: column; }
       .footer { flex-direction: column; }
+    }
+
+    /* Scroll-linked touches, only where the browser runs them off the main thread. */
+    @supports (animation-timeline: view()) {
+      @media (prefers-reduced-motion: no-preference) {
+        .hero-copy { animation: hero-exit linear both; animation-timeline: view(); animation-range: exit 0% exit 100%; }
+        @keyframes hero-exit { to { opacity: .15; transform: translateY(-8vh); } }
+        .feature-media { animation: media-open linear both; animation-timeline: view(); animation-range: entry 0% cover 32%; }
+        @keyframes media-open { from { clip-path: inset(6% 4% round 20px); } to { clip-path: inset(0 round 0); } }
+      }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -1004,7 +1049,7 @@
     <section class="manifesto" aria-labelledby="manifesto-title">
       <div class="manifesto-grid shell">
         <p class="eyebrow reveal"><span class="section-index">00</span> The premise</p>
-        <h2 class="reveal" id="manifesto-title">A robot is only as intelligent as the <em>whole chain</em> behind its motion.</h2>
+        <h2 id="manifesto-title">A robot is only as intelligent as the <em>whole chain</em> behind its motion.</h2>
         <div class="manifesto-foot reveal"><p>I work where disciplines collide: geometry becomes trajectories, trajectories become packets, and packets become physical movement.</p><p>The result is software that understands the machine above it—and the hardware below it.</p></div>
       </div>
     </section>
@@ -1044,7 +1089,7 @@
 
         <article class="feature reveal">
           <div class="feature-media">
-            <video id="projectVideo" muted loop playsinline preload="metadata" aria-label="A modular robotic arm running in RViz and Gazebo simulation"><source src="robot-kol-demo-1080p.mp4" type="video/mp4"></video>
+            <video id="projectVideo" muted loop playsinline preload="none" poster="assets/robotics/modular-arm/demo-poster.webp" aria-label="A modular robotic arm running in RViz and Gazebo simulation"><source src="assets/robotics/modular-arm/demo-540p.mp4" type="video/mp4" media="(max-width: 800px)"><source src="robot-kol-demo-1080p.mp4" type="video/mp4"></video>
             <button class="video-control" id="videoControl" type="button" aria-label="Play project video"><svg class="play-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="m7 5 8 5-8 5V5Z" fill="currentColor"/></svg><span>Play film</span></button>
           </div>
           <div class="feature-copy">
@@ -1643,32 +1688,99 @@
     const journey = document.getElementById('journey');
     const chapters = [...document.querySelectorAll('.chapter')];
     const journeyBars = [...document.querySelectorAll('.journey-step i')];
+    const journeyVisual = journey.querySelector('.journey-visual');
+    const seamLive = document.getElementById('seamLive');
     const stateLabel = document.getElementById('stateLabel');
     const stateLabels = ['Geometry loaded', 'Path solved', 'Motion active', 'Evidence captured'];
     const storyTargets = [{x:300,y:425}, {x:455,y:370}, {x:602,y:348}, {x:720,y:344}];
+    const storyArm = { paths: ['storyArmShadow','storyArm','storyArmEdge'], elbow:'storyElbow', wrist:'storyWrist', tool:'storyTool' };
+    // Same query as the CSS: wide and tall enough to pin the section; otherwise the arm sticks while chapters scroll.
+    const pinnedJourney = matchMedia('(min-width: 801px) and (min-height: 601px)');
+    let journeyNear = true, chapterShown = -1, armTarget = 0, armShown = null, armFrame = 0;
+
+    function journeyProgress() {
+      if (pinnedJourney.matches) {
+        const length = journey.offsetHeight - innerHeight;
+        return clamp(-journey.getBoundingClientRect().top / Math.max(1, length), 0, 1);
+      }
+      // Stacked layout: follow the chapter centres across a reading line just below the sticky arm.
+      const visual = journeyVisual.getBoundingClientRect();
+      const beside = chapters[0].getBoundingClientRect().right <= visual.left + 1;
+      const line = beside ? innerHeight * .55 : visual.bottom + (innerHeight - visual.bottom) * .45;
+      const centres = chapters.map(chapter => { const rect = chapter.getBoundingClientRect(); return rect.top + rect.height / 2; });
+      if (line <= centres[0]) return 0;
+      for (let i = 0; i < centres.length - 1; i++) {
+        if (line < centres[i + 1]) return (i + (line - centres[i]) / (centres[i + 1] - centres[i])) / (centres.length - 1);
+      }
+      return 1;
+    }
+    function drawArm(p) {
+      const phase = Math.min(2, Math.floor(p * 3));
+      const local = p >= 1 ? 1 : (p * 3) - phase;
+      const from = storyTargets[phase], to = storyTargets[phase + 1];
+      positionArm(storyArm, lerp(from.x, to.x, local), lerp(from.y, to.y, local), 180, 510, 300, 265);
+      seamLive.style.strokeDasharray = `${p} 1`;
+    }
+    // The arm eases toward the scroll position instead of snapping to it, so flicks read as motion, not jumps.
+    function animateArm() {
+      armShown += (armTarget - armShown) * .16;
+      if (Math.abs(armTarget - armShown) < .0008) armShown = armTarget;
+      drawArm(armShown);
+      armFrame = armShown === armTarget ? 0 : requestAnimationFrame(animateArm);
+    }
+    function updateJourney() {
+      const p = journeyProgress();
+      const index = pinnedJourney.matches ? clamp(Math.floor(p * 4), 0, 3) : Math.round(p * 3);
+      if (index !== chapterShown) {
+        chapters.forEach((chapter, i) => { chapter.classList.toggle('active', i === index); chapter.classList.toggle('past', i < index); });
+        stateLabel.textContent = stateLabels[index];
+        chapterShown = index;
+      }
+      journeyBars.forEach((bar, i) => bar.style.transform = `scaleX(${clamp(p * 4 - i, 0, 1)})`);
+      armTarget = p;
+      if (armShown === null || reducedMotion) { armShown = p; drawArm(p); }
+      else if (!armFrame) armFrame = requestAnimationFrame(animateArm);
+    }
+    new IntersectionObserver(([entry]) => { journeyNear = entry.isIntersecting; if (journeyNear) updateJourney(); }, { rootMargin: '25% 0px' }).observe(journey);
+    pinnedJourney.addEventListener('change', () => { chapterShown = -1; updateJourney(); });
+
+    // The premise sentence fills in word by word as it is read.
+    const premise = document.getElementById('manifesto-title');
+    const premiseWords = [];
+    let premiseLit = -1;
+    if (!reducedMotion) {
+      (function split(node) {
+        [...node.childNodes].forEach(child => {
+          if (child.nodeType !== Node.TEXT_NODE) return split(child);
+          const fragment = document.createDocumentFragment();
+          child.textContent.split(/(\s+)/).forEach(part => {
+            if (!part) return;
+            if (/^\s+$/.test(part)) return fragment.append(part);
+            const word = document.createElement('span');
+            word.className = 'w'; word.textContent = part;
+            premiseWords.push(word); fragment.append(word);
+          });
+          child.replaceWith(fragment);
+        });
+      })(premise);
+      premise.classList.add('is-split');
+    }
+    function updatePremise() {
+      const rect = premise.getBoundingClientRect();
+      if (rect.bottom < 0 || rect.top > innerHeight) return;
+      const p = clamp((innerHeight * .85 - rect.top) / (rect.height + innerHeight * .4), 0, 1);
+      const lit = Math.round(p * premiseWords.length);
+      if (lit === premiseLit) return;
+      premiseWords.forEach((word, i) => word.classList.toggle('lit', i < lit));
+      premiseLit = lit;
+    }
 
     function updateScroll() {
       const scrollMax = document.documentElement.scrollHeight - innerHeight;
       progress.style.transform = `scaleX(${scrollMax > 0 ? scrollY / scrollMax : 0})`;
       header.classList.toggle('scrolled', scrollY > 24);
-      if (innerWidth > 800) {
-        const rect = journey.getBoundingClientRect();
-        const length = journey.offsetHeight - innerHeight;
-        const p = clamp(-rect.top / Math.max(1, length), 0, 1);
-        const scaled = p * 4;
-        const chapterIndex = clamp(Math.floor(scaled), 0, 3);
-        chapters.forEach((chapter, index) => chapter.classList.toggle('active', index === chapterIndex));
-        stateLabel.textContent = stateLabels[chapterIndex];
-        journeyBars.forEach((bar, index) => bar.style.transform = `scaleX(${clamp(scaled - index, 0, 1)})`);
-        const phase = Math.min(2, Math.floor(p * 3));
-        const local = p === 1 ? 1 : (p * 3) - phase;
-        const from = storyTargets[phase], to = storyTargets[phase + 1];
-        positionArm({ paths: ['storyArmShadow','storyArm','storyArmEdge'], elbow:'storyElbow', wrist:'storyWrist', tool:'storyTool' }, lerp(from.x,to.x,local), lerp(from.y,to.y,local), 180, 510, 300, 265);
-        document.getElementById('seamLive').style.strokeDasharray = `${p} 1`;
-      } else {
-        positionArm({ paths: ['storyArmShadow','storyArm','storyArmEdge'], elbow:'storyElbow', wrist:'storyWrist', tool:'storyTool' }, 602, 348, 180, 510, 300, 265);
-        document.getElementById('seamLive').style.strokeDasharray = '1 0';
-      }
+      if (journeyNear) updateJourney();
+      if (premiseWords.length) updatePremise();
       ticking = false;
     }
     function onScroll() { if (!ticking) { requestAnimationFrame(updateScroll); ticking = true; } }
